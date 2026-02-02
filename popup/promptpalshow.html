@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptPal: Product Infographic</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Palette: Vibrant Tech Blue & Coral -->
+    <!-- Primary: #2563EB (Blue) -->
+    <!-- Secondary: #F97316 (Orange) -->
+    <!-- Tertiary: #14B8A6 (Teal) -->
+    <!-- Background: #F8FAFC (Slate 50) -->
+    <!-- Text: #1E293B (Slate 800) -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            blue: '#2563EB',
+                            dark: '#1E293B',
+                            light: '#F8FAFC',
+                            coral: '#F97316',
+                            teal: '#14B8A6'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Chart Container Styling - Mandatory Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            /* Explicit max-width */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            /* Base height */
+            max-height: 400px;
+        }
+
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+    <!-- 
+        NO SVG USED IN THIS FILE. 
+        NO MERMAID JS USED IN THIS FILE.
+        PALETTE: Vibrant Tech Blue & Coral.
+    -->
+</head>
+
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-coral selection:text-white">
+
+    <!-- Narrative Plan Summary -->
+    <!-- 
+        1. Header: Hook & Value Prop.
+        2. Context: The Efficiency Gap (Problem vs Solution).
+        3. Strategy: User Personas & Success Metrics.
+        4. Technical: Performance & Architecture Flow.
+        5. Risk Analysis: Scatter Plot.
+        6. Roadmap: Future Timeline.
+    -->
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-brand-blue to-indigo-700 text-white pt-16 pb-24 px-4 shadow-xl">
+        <div class="max-w-6xl mx-auto text-center">
+            <div
+                class="inline-block px-4 py-1 mb-4 rounded-full bg-brand-coral bg-opacity-20 border border-brand-coral text-brand-coral font-bold text-sm tracking-wider uppercase">
+                Product Requirements V1.0
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                PromptPal
+            </h1>
+            <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed">
+                Empowering everyday AI users to get more value by making prompt reuse effortless.
+                <span class="font-bold text-white">Save once, reuse everywhere.</span>
+            </p>
+
+            <div class="mt-10 flex flex-wrap justify-center gap-6">
+                <div class="bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl border border-white/20">
+                    <span class="block text-3xl font-bold">100%</span>
+                    <span class="text-sm text-blue-200">Local Storage</span>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl border border-white/20">
+                    <span class="block text-3xl font-bold">&lt;50ms</span>
+                    <span class="text-sm text-blue-200">Insertion Time</span>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm px-6 py-4 rounded-xl border border-white/20">
+                    <span class="block text-3xl font-bold">5+</span>
+                    <span class="text-sm text-blue-200">Supported Platforms</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-6xl mx-auto px-4 -mt-16 pb-20 space-y-20 relative z-10">
+
+        <!-- SECTION 1: Strategic Overview (Personas & Metrics) -->
+        <section>
+            <div class="glass-card rounded-2xl shadow-lg p-8">
+                <div class="mb-8 border-b border-gray-100 pb-4">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-2">Strategic Overview</h2>
+                    <p class="text-gray-600 leading-relaxed">
+                        PromptPal targets a specific spectrum of AI users, from beginners needing assistance to power
+                        users requiring efficiency. Our success is defined by aggressive adoption and engagement metrics
+                        within the first 90 days.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+
+                    <!-- Chart 1: Target Personas -->
+                    <div class="flex flex-col h-full">
+                        <div class="chart-container bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <canvas id="personaChart"></canvas>
+                        </div>
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-brand-blue">
+                            <h3 class="font-bold text-brand-blue text-lg mb-1">User Segmentation</h3>
+                            <p class="text-sm text-gray-700">
+                                <strong>The Beginner</strong> is our primary target, aiming to reduce the "intimidating"
+                                nature of AI. <strong>Power Users</strong> and <strong>Researchers</strong> provide
+                                depth and sustained daily usage.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Success Metrics -->
+                    <div class="flex flex-col h-full">
+                        <div class="chart-container bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                            <canvas id="metricsChart"></canvas>
+                        </div>
+                        <div class="mt-4 p-4 bg-orange-50 rounded-lg border-l-4 border-brand-coral">
+                            <h3 class="font-bold text-brand-coral text-lg mb-1">90-Day Success Targets</h3>
+                            <p class="text-sm text-gray-700">
+                                We aim for <strong>5,000+ active installs</strong> and a <strong>20% daily active user
+                                    (DAU)</strong> rate, validating the product's stickiness and utility.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Technical Performance -->
+        <section>
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="mb-8 border-b border-gray-100 pb-4">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-2">Technical Performance</h2>
+                    <p class="text-gray-600 leading-relaxed">
+                        Speed is a feature. PromptPal operates on a strict latency budget to ensure the user flow
+                        remains uninterrupted. The extension is built on Manifest V3 for security and performance.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Chart 3: Latency Targets -->
+                    <div class="lg:col-span-2">
+                        <div class="chart-container bg-slate-50 p-4 rounded-xl border border-gray-200">
+                            <canvas id="latencyChart"></canvas>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-500 italic text-center">
+                            *Time to interactive metrics (Milliseconds)
+                        </p>
+                    </div>
+
+                    <!-- Context Text -->
+                    <div class="lg:col-span-1 flex flex-col justify-center space-y-6">
+                        <div class="p-6 bg-brand-dark text-white rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold mb-2 text-brand-teal">Zero Friction</h3>
+                            <p class="text-sm text-gray-300">
+                                Users should never feel the tool loading. With a target of <strong>&lt;50ms</strong> for
+                                prompt insertion, the action feels native to the browser.
+                            </p>
+                        </div>
+                        <div class="p-6 bg-gray-100 rounded-xl border border-gray-200">
+                            <h3 class="text-xl font-bold mb-2 text-brand-dark">Input Detection</h3>
+                            <p class="text-sm text-gray-600">
+                                The logic engine uses 5 distinct strategies to find input fields (Textarea,
+                                ContentEditable, Aria-Label, etc.) to ensure compatibility across platforms like Gemini,
+                                Claude, and ChatGPT.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Smart Input Detection Flow (Diagram) -->
+        <section>
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-xl p-8 text-white">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold mb-2">Smart Input Logic Engine</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">
+                        How PromptPal ensures your prompt lands in the right place, regardless of the website's
+                        underlying code structure.
+                    </p>
+                </div>
+
+                <!-- CSS Flowchart (No Mermaid/SVG) -->
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 py-8 overflow-x-auto">
+
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center min-w-[150px]">
+                        <div
+                            class="w-full bg-brand-blue p-4 rounded-lg text-center font-bold shadow-lg border border-blue-400">
+                            User Press<br>Alt + P
+                        </div>
+                        <div class="text-3xl text-gray-500 my-2">↓</div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center min-w-[150px]">
+                        <div
+                            class="w-full bg-slate-700 p-4 rounded-lg text-center font-semibold shadow-md border border-slate-600">
+                            Scan:<br>Active Tab
+                        </div>
+                        <div class="text-3xl text-gray-500 my-2">↓</div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center min-w-[180px]">
+                        <div
+                            class="w-full bg-brand-teal text-slate-900 p-4 rounded-lg text-center font-bold shadow-lg border border-teal-300">
+                            Strategy 1:<br>Focus Check
+                        </div>
+                        <div class="text-3xl text-gray-500 my-2">↓</div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col items-center min-w-[180px]">
+                        <div
+                            class="w-full bg-brand-coral p-4 rounded-lg text-center font-bold shadow-lg border border-orange-400">
+                            Strategy 2-5:<br>Site Selectors
+                        </div>
+                        <div class="text-3xl text-gray-500 my-2">↓</div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center min-w-[150px]">
+                        <div
+                            class="w-full bg-green-600 p-4 rounded-lg text-center font-bold shadow-lg border border-green-400">
+                            Execute:<br>Insert Text
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                    <p class="text-sm text-gray-300">
+                        <strong>Supported Strategies:</strong> Standard Focus • Site-Specific Selectors (ChatGPT/Claude)
+                        • ContentEditable • ARIA Roles • Iframe Inspection
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Risk Analysis -->
+        <section>
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <div class="mb-8 border-b border-gray-100 pb-4">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-2">Risk Assessment Matrix</h2>
+                    <p class="text-gray-600 leading-relaxed">
+                        We actively monitor potential risks to stability and growth. The chart below maps identified
+                        risks based on their likelihood of occurrence versus their impact on the product.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2">
+                        <div class="chart-container bg-slate-50 p-4 rounded-xl border border-gray-200">
+                            <!-- Plotly Chart for Risk -->
+                            <div id="riskPlot" style="width: 100%; height: 100%;"></div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-1 space-y-4">
+                        <h3 class="font-bold text-gray-800 border-b pb-2">Mitigation Strategies</h3>
+
+                        <div class="p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                            <h4 class="font-bold text-red-700 text-sm">Web Store Rejection</h4>
+                            <p class="text-xs text-gray-600 mt-1">Strict adherence to policies and minimal permissions
+                                requests.</p>
+                        </div>
+
+                        <div class="p-3 bg-orange-50 border-l-4 border-orange-500 rounded">
+                            <h4 class="font-bold text-orange-700 text-sm">Site Layout Changes</h4>
+                            <p class="text-xs text-gray-600 mt-1">Multi-strategy input detection and rapid hotfix
+                                capability.</p>
+                        </div>
+
+                        <div class="p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                            <h4 class="font-bold text-blue-700 text-sm">Competitor Clones</h4>
+                            <p class="text-xs text-gray-600 mt-1">Maintain high iteration speed and build strong user
+                                relationships.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Roadmap -->
+        <section>
+            <div class="glass-card rounded-2xl shadow-lg p-8">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-2">Future Roadmap</h2>
+                    <p class="text-gray-600">The evolution of PromptPal from a local utility to a cloud-powered
+                        ecosystem.</p>
+                </div>
+
+                <div class="relative max-w-4xl mx-auto mt-12">
+                    <!-- Vertical Line -->
+                    <div
+                        class="absolute left-4 md:left-1/2 top-0 bottom-0 w-1 bg-gray-200 transform md:-translate-x-1/2">
+                    </div>
+
+                    <!-- Milestone 1 -->
+                    <div class="relative z-10 mb-12 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-1/2 md:pr-8 md:text-right pl-12 md:pl-0 mb-4 md:mb-0">
+                            <h3 class="text-2xl font-bold text-brand-blue">v1.0 (Q1 2026)</h3>
+                            <span
+                                class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded uppercase mt-1">Released</span>
+                            <p class="text-gray-600 mt-2">Core Launch: Universal Save, Instant Insert, Smart
+                                Organization, Dark Mode.</p>
+                        </div>
+                        <div
+                            class="absolute left-4 md:left-1/2 w-4 h-4 bg-brand-blue rounded-full border-4 border-white shadow transform -translate-x-1/2">
+                        </div>
+                        <div class="w-full md:w-1/2 md:pl-8"></div>
+                    </div>
+
+                    <!-- Milestone 2 -->
+                    <div class="relative z-10 mb-12 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-1/2 md:pr-8 md:text-right hidden md:block"></div>
+                        <div
+                            class="absolute left-4 md:left-1/2 w-4 h-4 bg-brand-teal rounded-full border-4 border-white shadow transform -translate-x-1/2">
+                        </div>
+                        <div class="w-full md:w-1/2 md:pl-8 pl-12">
+                            <h3 class="text-2xl font-bold text-brand-teal">v1.1 (Q2 2026)</h3>
+                            <p class="text-gray-600 mt-2">Enhanced Organization: Prompt Templates with Variables
+                                ({{name}}), Bulk Operations, Usage Analytics.</p>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 3 -->
+                    <div class="relative z-10 mb-12 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-1/2 md:pr-8 md:text-right pl-12 md:pl-0 mb-4 md:mb-0">
+                            <h3 class="text-2xl font-bold text-brand-coral">v1.2 (Q3 2026)</h3>
+                            <p class="text-gray-600 mt-2">Cross-Platform: Firefox Port (MV2), URL Sharing, Community
+                                Library.</p>
+                        </div>
+                        <div
+                            class="absolute left-4 md:left-1/2 w-4 h-4 bg-brand-coral rounded-full border-4 border-white shadow transform -translate-x-1/2">
+                        </div>
+                        <div class="w-full md:w-1/2 md:pl-8"></div>
+                    </div>
+
+                    <!-- Milestone 4 -->
+                    <div class="relative z-10 flex flex-col md:flex-row items-center w-full">
+                        <div class="w-full md:w-1/2 md:pr-8 md:text-right hidden md:block"></div>
+                        <div
+                            class="absolute left-4 md:left-1/2 w-4 h-4 bg-brand-dark rounded-full border-4 border-white shadow transform -translate-x-1/2">
+                        </div>
+                        <div class="w-full md:w-1/2 md:pl-8 pl-12">
+                            <h3 class="text-2xl font-bold text-brand-dark">v2.0 (2027)</h3>
+                            <p class="text-gray-600 mt-2">Premium & Sync: Cloud Backup, Team Sharing, AI Auto-Tagging.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-dark text-white py-12 px-4 mt-12">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <h2 class="text-3xl font-bold">PromptPal</h2>
+                <p class="text-blue-300">The productivity layer for the AI era.</p>
+            </div>
+            <div class="text-center md:text-right">
+                <p class="text-sm text-gray-400 mb-2">Available now on Chromium Browsers</p>
+                <a href="https://github.com/Sylviahaah/PromptPal" target="_blank" rel="noopener noreferrer"
+                    class="inline-block bg-brand-blue hover:bg-blue-600 transition-colors text-white font-bold py-3 px-8 rounded-lg cursor-pointer no-underline">
+                    Download v1.0
+                </a>
+            </div>
+        </div>
+        <div class="max-w-6xl mx-auto mt-8 pt-8 border-t border-gray-700 text-center text-xs text-gray-500">
+            &copy; 2026 PromptPal Product Team. By Sylvia . Internal Use Only.
+        </div>
+    </footer>
+
+    <!-- Chart Logic -->
+    <script>
+        // --- HELPER FUNCTIONS ---
+
+        // 1. Label Wrapping Logic (Mandatory >16 char split)
+        function processLabels(labels) {
+            return labels.map(label => {
+                if (label.length > 16) {
+                    const words = label.split(' ');
+                    const lines = [];
+                    let currentLine = words[0];
+
+                    for (let i = 1; i < words.length; i++) {
+                        if ((currentLine + " " + words[i]).length <= 16) {
+                            currentLine += " " + words[i];
+                        } else {
+                            lines.push(currentLine);
+                            currentLine = words[i];
+                        }
+                    }
+                    lines.push(currentLine);
+                    return lines;
+                }
+                return label;
+            });
+        }
+
+        // 2. Tooltip Configuration (Mandatory)
+        const commonTooltipConfig = {
+            callbacks: {
+                title: function (tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // --- CHART 1: PERSONAS (Donut) ---
+        const ctxPersona = document.getElementById('personaChart').getContext('2d');
+        const personaLabels = ["The Beginner", "The Power User", "The Researcher"];
+        const processedPersonaLabels = processLabels(personaLabels);
+
+        new Chart(ctxPersona, {
+            type: 'doughnut',
+            data: {
+                labels: processedPersonaLabels,
+                datasets: [{
+                    data: [50, 30, 20], // Estimated split based on "Primary Target" text
+                    backgroundColor: [
+                        '#2563EB', // Blue
+                        '#F97316', // Orange
+                        '#14B8A6'  // Teal
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: commonTooltipConfig,
+                    title: {
+                        display: true,
+                        text: 'Target User Distribution'
+                    }
+                }
+            }
+        });
+
+        // --- CHART 2: SUCCESS METRICS (Bar) ---
+        const ctxMetrics = document.getElementById('metricsChart').getContext('2d');
+        const metricLabels = ["Active Installs (90d)", "Prompts Saved / User", "Insertions / Day"];
+        const processedMetricLabels = processLabels(metricLabels);
+
+        new Chart(ctxMetrics, {
+            type: 'bar',
+            data: {
+                labels: processedMetricLabels,
+                datasets: [{
+                    label: 'Target Goal',
+                    data: [5000, 10, 3],
+                    backgroundColor: '#F97316', // Coral
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { display: false }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    tooltip: commonTooltipConfig,
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Key Success Indicators'
+                    }
+                }
+            }
+        });
+
+        // --- CHART 3: LATENCY (Horizontal Bar) ---
+        const ctxLatency = document.getElementById('latencyChart').getContext('2d');
+        const latencyLabels = ["Popup Open Time", "Floating UI Appear", "Prompt Insertion", "Search Response"];
+        const processedLatencyLabels = processLabels(latencyLabels);
+
+        new Chart(ctxLatency, {
+            type: 'bar',
+            data: {
+                labels: processedLatencyLabels,
+                datasets: [{
+                    label: 'Target Latency (ms)',
+                    data: [200, 100, 50, 100],
+                    backgroundColor: [
+                        '#2563EB',
+                        '#2563EB',
+                        '#14B8A6', // Highlight Insertion
+                        '#2563EB'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Horizontal
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Milliseconds (Lower is Better)' }
+                    }
+                },
+                plugins: {
+                    tooltip: commonTooltipConfig,
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Performance Requirements'
+                    }
+                }
+            }
+        });
+
+        // --- CHART 4: RISK ANALYSIS (Plotly Bubble Chart) ---
+        // Using Plotly for better Scatter capability as requested
+        // Data derived from Risk Assessment table in PRD
+
+        const riskData = [
+            { name: "Chrome Web Store rejection", likelihood: 2, impact: 3, size: 20, color: '#EF4444' }, // Med, High
+            { name: "AI site layout changes", likelihood: 3, impact: 2, size: 25, color: '#F97316' }, // High, Med
+            { name: "Low adoption", likelihood: 2, impact: 3, size: 20, color: '#2563EB' }, // Med, High
+            { name: "Competitor copies features", likelihood: 2, impact: 1, size: 15, color: '#94A3B8' }, // Med, Low
+            { name: "Storage quota exhaustion", likelihood: 1, impact: 2, size: 15, color: '#14B8A6' } // Low, Med
+        ];
+
+        // Process labels for Plotly is tricky directly on hover, so we format the hover text
+        const trace = {
+            x: riskData.map(d => d.likelihood),
+            y: riskData.map(d => d.impact),
+            mode: 'markers+text',
+            text: riskData.map(d => ''), // Hide text on chart to avoid clutter, rely on hover
+            textposition: 'top center',
+            marker: {
+                size: riskData.map(d => d.size * 2), // Scale up
+                color: riskData.map(d => d.color),
+                opacity: 0.7
+            },
+            type: 'scatter',
+            hovertemplate:
+                '<b>%{customdata}</b><br>' +
+                'Likelihood: %{x}<br>' +
+                'Impact: %{y}<br>' +
+                '<extra></extra>',
+            customdata: riskData.map(d => d.name) // Pass full names here
+        };
+
+        const layout = {
+            title: {
+                text: 'Risk Probability vs. Impact',
+                font: { family: 'Inter', size: 16, color: '#1E293B' }
+            },
+            xaxis: {
+                title: 'Likelihood (1=Low, 3=High)',
+                range: [0.5, 3.5],
+                tickvals: [1, 2, 3],
+                ticktext: ['Low', 'Medium', 'High'],
+                zeroline: false
+            },
+            yaxis: {
+                title: 'Impact (1=Low, 3=High)',
+                range: [0.5, 3.5],
+                tickvals: [1, 2, 3],
+                ticktext: ['Low', 'Medium', 'High'],
+                zeroline: false
+            },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            margin: { t: 40, b: 40, l: 60, r: 20 },
+            showlegend: false
+        };
+
+        // Render Plotly
+        Plotly.newPlot('riskPlot', [trace], layout, { displayModeBar: false, responsive: true });
+
+    </script>
+</body>
+
+</html>
