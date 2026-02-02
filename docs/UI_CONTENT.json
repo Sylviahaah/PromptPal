@@ -1,0 +1,863 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-02",
+    "description": "PromptPal in-app help content and tooltips for i18n implementation"
+  },
+  "onboarding": {
+    "welcome": {
+      "en": {
+        "title": "Welcome to PromptPal! 👋",
+        "subtitle": "Your AI Prompt Assistant",
+        "content": "Save your best prompts once, reuse them everywhere. No more retyping the same prompts in ChatGPT, Claude, or Gemini.",
+        "button": "Let's Get Started"
+      },
+      "zh_CN": {
+        "title": "欢迎使用 PromptPal！👋",
+        "subtitle": "你的 AI 提示词助手",
+        "content": "保存你的常用提示词，随时随地一键复用。告别在 ChatGPT、Claude 或 Gemini 中重复输入。",
+        "button": "开始使用"
+      }
+    },
+    "step1": {
+      "en": {
+        "stepNumber": "1",
+        "stepLabel": "Step 1 of 3",
+        "title": "Save Prompts Easily",
+        "content": "Select any text on a webpage, right-click, and choose \"Save to Prompt Library\". Or use Alt+S for quick save.",
+        "tip": "💡 Tip: Alt+S saves instantly without any dialog!",
+        "button": "Next"
+      },
+      "zh_CN": {
+        "stepNumber": "1",
+        "stepLabel": "第 1 步，共 3 步",
+        "title": "轻松保存提示词",
+        "content": "选中网页上的任意文字，点击右键，选择「保存到提示词库」。或者使用 Alt+S 快速保存。",
+        "tip": "💡 小贴士：Alt+S 可以直接保存，无需确认对话框！",
+        "button": "下一步"
+      }
+    },
+    "step2": {
+      "en": {
+        "stepNumber": "2",
+        "stepLabel": "Step 2 of 3",
+        "title": "Insert Prompts Anywhere",
+        "content": "On any AI chat (ChatGPT, Claude, Gemini), click in the input field and press Alt+P. Pick a prompt to insert it instantly.",
+        "tip": "💡 Tip: Use ↑↓ arrow keys to navigate, Enter to select!",
+        "button": "Next"
+      },
+      "zh_CN": {
+        "stepNumber": "2",
+        "stepLabel": "第 2 步，共 3 步",
+        "title": "随处插入提示词",
+        "content": "在任何 AI 对话中（ChatGPT、Claude、Gemini），点击输入框并按 Alt+P。选择一个提示词即可快速插入。",
+        "tip": "💡 小贴士：使用 ↑↓ 箭头键导航，回车键选择！",
+        "button": "下一步"
+      }
+    },
+    "step3": {
+      "en": {
+        "stepNumber": "3",
+        "stepLabel": "Step 3 of 3",
+        "title": "Organize Your Library",
+        "content": "Click \"View All Prompts\" to manage your collection. Add categories, tags, pin favorites, and search your entire library.",
+        "tip": "💡 Tip: Pin your most-used prompts for quick access!",
+        "button": "Got It!"
+      },
+      "zh_CN": {
+        "stepNumber": "3",
+        "stepLabel": "第 3 步，共 3 步",
+        "title": "整理你的提示词库",
+        "content": "点击「查看全部提示词」来管理你的收藏。添加分类、标签，置顶常用提示词，或搜索整个库。",
+        "tip": "💡 小贴士：置顶你最常用的提示词，方便快速访问！",
+        "button": "开始使用！"
+      }
+    },
+    "complete": {
+      "en": {
+        "title": "You're All Set! 🎉",
+        "content": "We've added 5 sample prompts to get you started. Need help anytime? Click the ? icon.",
+        "shortcuts": "Quick Reference: Alt+S = Save | Alt+P = Insert | Esc = Close",
+        "button": "Start Using PromptPal"
+      },
+      "zh_CN": {
+        "title": "设置完成！🎉",
+        "content": "我们已添加 5 个示例提示词帮助你上手。随时需要帮助？点击 ? 图标。",
+        "shortcuts": "快捷键参考：Alt+S = 保存 | Alt+P = 插入 | Esc = 关闭",
+        "button": "开始使用 PromptPal"
+      }
+    }
+  },
+  "tooltips": {
+    "save_button": {
+      "en": {
+        "text": "Save as new prompt",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "保存为新提示词",
+        "position": "bottom"
+      }
+    },
+    "quick_save_shortcut": {
+      "en": {
+        "text": "Alt+S to save selected text",
+        "position": "right"
+      },
+      "zh_CN": {
+        "text": "Alt+S 保存选中文字",
+        "position": "right"
+      }
+    },
+    "insert_shortcut": {
+      "en": {
+        "text": "Alt+P to insert prompts",
+        "position": "right"
+      },
+      "zh_CN": {
+        "text": "Alt+P 插入提示词",
+        "position": "right"
+      }
+    },
+    "view_all_prompts": {
+      "en": {
+        "text": "Open full prompt library",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "打开完整提示词库",
+        "position": "bottom"
+      }
+    },
+    "settings_gear": {
+      "en": {
+        "text": "Settings",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "设置",
+        "position": "bottom"
+      }
+    },
+    "help_button": {
+      "en": {
+        "text": "Help",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "帮助",
+        "position": "bottom"
+      }
+    },
+    "pin_prompt": {
+      "en": {
+        "text": "Pin to top",
+        "position": "left"
+      },
+      "zh_CN": {
+        "text": "置顶",
+        "position": "left"
+      }
+    },
+    "unpin_prompt": {
+      "en": {
+        "text": "Unpin",
+        "position": "left"
+      },
+      "zh_CN": {
+        "text": "取消置顶",
+        "position": "left"
+      }
+    },
+    "edit_prompt": {
+      "en": {
+        "text": "Edit prompt",
+        "position": "left"
+      },
+      "zh_CN": {
+        "text": "编辑提示词",
+        "position": "left"
+      }
+    },
+    "delete_prompt": {
+      "en": {
+        "text": "Delete prompt",
+        "position": "left"
+      },
+      "zh_CN": {
+        "text": "删除提示词",
+        "position": "left"
+      }
+    },
+    "copy_prompt": {
+      "en": {
+        "text": "Copy to clipboard",
+        "position": "left"
+      },
+      "zh_CN": {
+        "text": "复制到剪贴板",
+        "position": "left"
+      }
+    },
+    "export_button": {
+      "en": {
+        "text": "Download prompts as JSON backup",
+        "position": "top"
+      },
+      "zh_CN": {
+        "text": "下载提示词为 JSON 备份",
+        "position": "top"
+      }
+    },
+    "import_button": {
+      "en": {
+        "text": "Restore from backup file",
+        "position": "top"
+      },
+      "zh_CN": {
+        "text": "从备份文件恢复",
+        "position": "top"
+      }
+    },
+    "clear_data_button": {
+      "en": {
+        "text": "Warning: Deletes all prompts permanently",
+        "position": "top"
+      },
+      "zh_CN": {
+        "text": "警告：将永久删除所有提示词",
+        "position": "top"
+      }
+    },
+    "save_mode_quick": {
+      "en": {
+        "text": "Save instantly without confirmation",
+        "position": "right"
+      },
+      "zh_CN": {
+        "text": "即时保存，无需确认",
+        "position": "right"
+      }
+    },
+    "save_mode_detailed": {
+      "en": {
+        "text": "Show dialog to add title & category",
+        "position": "right"
+      },
+      "zh_CN": {
+        "text": "显示对话框以添加标题和分类",
+        "position": "right"
+      }
+    },
+    "search_input": {
+      "en": {
+        "text": "Search by title, content, or tags",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "按标题、内容或标签搜索",
+        "position": "bottom"
+      }
+    },
+    "category_filter": {
+      "en": {
+        "text": "Filter by category",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "按分类筛选",
+        "position": "bottom"
+      }
+    },
+    "sort_dropdown": {
+      "en": {
+        "text": "Sort prompts",
+        "position": "bottom"
+      },
+      "zh_CN": {
+        "text": "排序提示词",
+        "position": "bottom"
+      }
+    }
+  },
+  "errors": {
+    "no_selection": {
+      "en": {
+        "code": "ERR_NO_SELECTION",
+        "title": "No Text Selected",
+        "message": "Please select some text first, then try again.",
+        "action": null,
+        "icon": "⚠️"
+      },
+      "zh_CN": {
+        "code": "ERR_NO_SELECTION",
+        "title": "未选中文字",
+        "message": "请先选中一些文字，然后重试。",
+        "action": null,
+        "icon": "⚠️"
+      }
+    },
+    "storage_full": {
+      "en": {
+        "code": "ERR_STORAGE_FULL",
+        "title": "Storage Limit Reached",
+        "message": "Your prompt library is full. Delete some prompts or export a backup.",
+        "action": "Open Manager",
+        "actionUrl": "popup/manager.html",
+        "icon": "📦"
+      },
+      "zh_CN": {
+        "code": "ERR_STORAGE_FULL",
+        "title": "存储空间已满",
+        "message": "你的提示词库已满。请删除一些提示词或导出备份。",
+        "action": "打开管理器",
+        "actionUrl": "popup/manager.html",
+        "icon": "📦"
+      }
+    },
+    "insert_failed": {
+      "en": {
+        "code": "ERR_INSERT_FAILED",
+        "title": "Insert Failed",
+        "message": "Couldn't insert into this input. Try clicking in the text field first.",
+        "action": "Copy Instead",
+        "icon": "❌"
+      },
+      "zh_CN": {
+        "code": "ERR_INSERT_FAILED",
+        "title": "插入失败",
+        "message": "无法插入到此输入框。请尝试先点击文本框。",
+        "action": "复制替代",
+        "icon": "❌"
+      }
+    },
+    "no_input_focused": {
+      "en": {
+        "code": "ERR_NO_INPUT",
+        "title": "No Input Field Found",
+        "message": "Please click in a text input or chat box first.",
+        "action": null,
+        "icon": "💬"
+      },
+      "zh_CN": {
+        "code": "ERR_NO_INPUT",
+        "title": "未找到输入框",
+        "message": "请先点击文本输入框或聊天框。",
+        "action": null,
+        "icon": "💬"
+      }
+    },
+    "import_invalid": {
+      "en": {
+        "code": "ERR_IMPORT_INVALID",
+        "title": "Invalid Import File",
+        "message": "This file doesn't look like a PromptPal backup. Please select a valid .json file.",
+        "action": null,
+        "icon": "📄"
+      },
+      "zh_CN": {
+        "code": "ERR_IMPORT_INVALID",
+        "title": "无效的导入文件",
+        "message": "此文件不是有效的 PromptPal 备份。请选择正确的 .json 文件。",
+        "action": null,
+        "icon": "📄"
+      }
+    },
+    "import_parse_error": {
+      "en": {
+        "code": "ERR_IMPORT_PARSE",
+        "title": "File Read Error",
+        "message": "Couldn't read the file. Make sure it's not corrupted.",
+        "action": null,
+        "icon": "🔧"
+      },
+      "zh_CN": {
+        "code": "ERR_IMPORT_PARSE",
+        "title": "文件读取错误",
+        "message": "无法读取文件。请确保文件未损坏。",
+        "action": null,
+        "icon": "🔧"
+      }
+    },
+    "prompt_not_found": {
+      "en": {
+        "code": "ERR_NOT_FOUND",
+        "title": "Prompt Not Found",
+        "message": "This prompt may have been deleted.",
+        "action": null,
+        "icon": "🔍"
+      },
+      "zh_CN": {
+        "code": "ERR_NOT_FOUND",
+        "title": "提示词未找到",
+        "message": "此提示词可能已被删除。",
+        "action": null,
+        "icon": "🔍"
+      }
+    },
+    "content_script_blocked": {
+      "en": {
+        "code": "ERR_SCRIPT_BLOCKED",
+        "title": "Page Not Supported",
+        "message": "PromptPal can't run on browser pages (chrome://, edge://) or protected sites.",
+        "action": null,
+        "icon": "🚫"
+      },
+      "zh_CN": {
+        "code": "ERR_SCRIPT_BLOCKED",
+        "title": "页面不支持",
+        "message": "PromptPal 无法在浏览器页面（chrome://、edge://）或受保护的网站上运行。",
+        "action": null,
+        "icon": "🚫"
+      }
+    },
+    "generic_error": {
+      "en": {
+        "code": "ERR_GENERIC",
+        "title": "Something Went Wrong",
+        "message": "An unexpected error occurred. Please try again.",
+        "action": "Report Issue",
+        "actionUrl": "mailto:support@promptpal.app",
+        "icon": "😕"
+      },
+      "zh_CN": {
+        "code": "ERR_GENERIC",
+        "title": "出错了",
+        "message": "发生意外错误。请重试。",
+        "action": "报告问题",
+        "actionUrl": "mailto:support@promptpal.app",
+        "icon": "😕"
+      }
+    }
+  },
+  "success": {
+    "prompt_saved": {
+      "en": {
+        "message": "Prompt saved! ✓",
+        "duration": 2000
+      },
+      "zh_CN": {
+        "message": "提示词已保存！✓",
+        "duration": 2000
+      }
+    },
+    "prompt_inserted": {
+      "en": {
+        "message": "Prompt inserted",
+        "duration": 1500
+      },
+      "zh_CN": {
+        "message": "提示词已插入",
+        "duration": 1500
+      }
+    },
+    "prompt_copied": {
+      "en": {
+        "message": "Copied to clipboard",
+        "duration": 1500
+      },
+      "zh_CN": {
+        "message": "已复制到剪贴板",
+        "duration": 1500
+      }
+    },
+    "prompt_deleted": {
+      "en": {
+        "message": "Prompt deleted",
+        "duration": 2000
+      },
+      "zh_CN": {
+        "message": "提示词已删除",
+        "duration": 2000
+      }
+    },
+    "prompt_updated": {
+      "en": {
+        "message": "Changes saved",
+        "duration": 1500
+      },
+      "zh_CN": {
+        "message": "更改已保存",
+        "duration": 1500
+      }
+    },
+    "prompt_pinned": {
+      "en": {
+        "message": "Pinned to top",
+        "duration": 1500
+      },
+      "zh_CN": {
+        "message": "已置顶",
+        "duration": 1500
+      }
+    },
+    "prompt_unpinned": {
+      "en": {
+        "message": "Unpinned",
+        "duration": 1500
+      },
+      "zh_CN": {
+        "message": "已取消置顶",
+        "duration": 1500
+      }
+    },
+    "settings_saved": {
+      "en": {
+        "message": "Settings updated",
+        "duration": 1500
+      },
+      "zh_CN": {
+        "message": "设置已更新",
+        "duration": 1500
+      }
+    },
+    "data_exported": {
+      "en": {
+        "message": "Data exported successfully! ✓",
+        "duration": 2500
+      },
+      "zh_CN": {
+        "message": "数据导出成功！✓",
+        "duration": 2500
+      }
+    },
+    "data_imported": {
+      "en": {
+        "message": "Data imported successfully!",
+        "duration": 2500
+      },
+      "zh_CN": {
+        "message": "数据导入成功！",
+        "duration": 2500
+      }
+    },
+    "data_cleared": {
+      "en": {
+        "message": "All data cleared",
+        "duration": 2000
+      },
+      "zh_CN": {
+        "message": "所有数据已清除",
+        "duration": 2000
+      }
+    }
+  },
+  "confirmations": {
+    "delete_prompt": {
+      "en": {
+        "title": "Delete Prompt?",
+        "message": "This action cannot be undone.",
+        "confirmButton": "Delete",
+        "cancelButton": "Cancel"
+      },
+      "zh_CN": {
+        "title": "删除提示词？",
+        "message": "此操作无法撤销。",
+        "confirmButton": "删除",
+        "cancelButton": "取消"
+      }
+    },
+    "clear_all_data": {
+      "en": {
+        "title": "Delete Everything?",
+        "message": "This will permanently delete all your saved prompts. This action cannot be undone.",
+        "confirmButton": "Delete All",
+        "cancelButton": "Cancel"
+      },
+      "zh_CN": {
+        "title": "删除所有数据？",
+        "message": "这将永久删除你所有保存的提示词。此操作无法撤销。",
+        "confirmButton": "全部删除",
+        "cancelButton": "取消"
+      }
+    },
+    "clear_all_data_final": {
+      "en": {
+        "title": "Are you absolutely sure?",
+        "message": "Click Delete to confirm permanent deletion.",
+        "confirmButton": "Delete",
+        "cancelButton": "Keep My Data"
+      },
+      "zh_CN": {
+        "title": "你确定吗？",
+        "message": "点击删除以确认永久删除。",
+        "confirmButton": "删除",
+        "cancelButton": "保留数据"
+      }
+    },
+    "import_merge": {
+      "en": {
+        "title": "Import Prompts",
+        "message": "This will add imported prompts to your existing library. Duplicates will be skipped.",
+        "confirmButton": "Import",
+        "cancelButton": "Cancel"
+      },
+      "zh_CN": {
+        "title": "导入提示词",
+        "message": "这将把导入的提示词添加到现有库中。重复项将被跳过。",
+        "confirmButton": "导入",
+        "cancelButton": "取消"
+      }
+    }
+  },
+  "empty_states": {
+    "no_prompts": {
+      "en": {
+        "title": "No prompts yet",
+        "message": "Select text on any page, right-click, and choose \"Save to Prompt Library\" to get started.",
+        "action": "Learn How",
+        "icon": "📝"
+      },
+      "zh_CN": {
+        "title": "还没有提示词",
+        "message": "在任意页面选中文字，右键点击，选择「保存到提示词库」开始使用。",
+        "action": "了解更多",
+        "icon": "📝"
+      }
+    },
+    "no_search_results": {
+      "en": {
+        "title": "No matches found",
+        "message": "Try different keywords or clear the search.",
+        "action": "Clear Search",
+        "icon": "🔍"
+      },
+      "zh_CN": {
+        "title": "未找到匹配项",
+        "message": "请尝试其他关键词或清除搜索。",
+        "action": "清除搜索",
+        "icon": "🔍"
+      }
+    },
+    "no_pinned_prompts": {
+      "en": {
+        "title": "No pinned prompts",
+        "message": "Pin your favorites for quick access.",
+        "action": null,
+        "icon": "📌"
+      },
+      "zh_CN": {
+        "title": "没有置顶提示词",
+        "message": "置顶你的常用提示词以便快速访问。",
+        "action": null,
+        "icon": "📌"
+      }
+    }
+  },
+  "help_sections": {
+    "popup": {
+      "en": {
+        "title": "Popup Help",
+        "items": [
+          {
+            "question": "How do I save a prompt?",
+            "answer": "Select text on any webpage, right-click, and choose \"Save to Prompt Library\". Or paste text here and click Save."
+          },
+          {
+            "question": "What's the keyboard shortcut?",
+            "answer": "Alt+S saves selected text instantly. Alt+P opens the prompt picker."
+          },
+          {
+            "question": "How do I insert a prompt?",
+            "answer": "On any AI chat, press Alt+P, then click a prompt to insert it."
+          }
+        ]
+      },
+      "zh_CN": {
+        "title": "弹窗帮助",
+        "items": [
+          {
+            "question": "如何保存提示词？",
+            "answer": "在任意网页上选中文字，右键点击，选择「保存到提示词库」。或在此处粘贴文字并点击保存。"
+          },
+          {
+            "question": "键盘快捷键是什么？",
+            "answer": "Alt+S 可即时保存选中文字。Alt+P 打开提示词选择器。"
+          },
+          {
+            "question": "如何插入提示词？",
+            "answer": "在任何 AI 对话中，按 Alt+P，然后点击提示词即可插入。"
+          }
+        ]
+      }
+    },
+    "manager": {
+      "en": {
+        "title": "Library Manager Help",
+        "items": [
+          {
+            "question": "How do I organize prompts?",
+            "answer": "Edit any prompt to add categories and tags. Use the filter dropdown to view by category."
+          },
+          {
+            "question": "How do I pin a prompt?",
+            "answer": "Click the pin icon on any prompt. Pinned prompts appear first in the list and in Alt+P picker."
+          },
+          {
+            "question": "How do I backup my prompts?",
+            "answer": "Go to Settings → Export Prompts. This downloads a JSON file you can import later."
+          }
+        ]
+      },
+      "zh_CN": {
+        "title": "提示词库管理器帮助",
+        "items": [
+          {
+            "question": "如何整理提示词？",
+            "answer": "编辑任意提示词以添加分类和标签。使用筛选下拉菜单按分类查看。"
+          },
+          {
+            "question": "如何置顶提示词？",
+            "answer": "点击任意提示词上的置顶图标。置顶的提示词会显示在列表顶部和 Alt+P 选择器中。"
+          },
+          {
+            "question": "如何备份我的提示词？",
+            "answer": "前往设置 → 导出提示词。这会下载一个 JSON 文件，之后可以导入。"
+          }
+        ]
+      }
+    },
+    "settings": {
+      "en": {
+        "title": "Settings Help",
+        "items": [
+          {
+            "question": "What's Quick vs Detailed save mode?",
+            "answer": "Quick mode saves instantly without any dialog. Detailed mode shows a form to add title, category, and tags."
+          },
+          {
+            "question": "Can I change keyboard shortcuts?",
+            "answer": "Yes! Go to chrome://extensions/shortcuts to customize Alt+S and Alt+P."
+          },
+          {
+            "question": "How do I restore from a backup?",
+            "answer": "Click Import Prompts and select your backup JSON file. Your prompts will be merged with existing ones."
+          }
+        ]
+      },
+      "zh_CN": {
+        "title": "设置帮助",
+        "items": [
+          {
+            "question": "快速模式和详细模式有什么区别？",
+            "answer": "快速模式即时保存，无需对话框。详细模式会显示表单，让你添加标题、分类和标签。"
+          },
+          {
+            "question": "我可以更改键盘快捷键吗？",
+            "answer": "可以！前往 chrome://extensions/shortcuts 自定义 Alt+S 和 Alt+P。"
+          },
+          {
+            "question": "如何从备份恢复？",
+            "answer": "点击导入提示词，选择你的备份 JSON 文件。你的提示词会与现有的合并。"
+          }
+        ]
+      }
+    }
+  },
+  "placeholders": {
+    "quick_save_textarea": {
+      "en": "Paste prompt content and save...",
+      "zh_CN": "粘贴提示词内容并保存..."
+    },
+    "search_input": {
+      "en": "Search prompts...",
+      "zh_CN": "搜索提示词..."
+    },
+    "prompt_title_input": {
+      "en": "Enter a title (optional)",
+      "zh_CN": "输入标题（可选）"
+    },
+    "prompt_tags_input": {
+      "en": "Add tags (comma-separated)",
+      "zh_CN": "添加标签（逗号分隔）"
+    }
+  },
+  "labels": {
+    "recent_prompts": {
+      "en": "Recently Used",
+      "zh_CN": "最近使用"
+    },
+    "pinned_prompts": {
+      "en": "Pinned",
+      "zh_CN": "已置顶"
+    },
+    "all_prompts": {
+      "en": "All Prompts",
+      "zh_CN": "全部提示词"
+    },
+    "categories": {
+      "en": "Categories",
+      "zh_CN": "分类"
+    },
+    "tags": {
+      "en": "Tags",
+      "zh_CN": "标签"
+    },
+    "usage_count": {
+      "en": "Used {{count}} times",
+      "zh_CN": "已使用 {{count}} 次"
+    },
+    "created_at": {
+      "en": "Created {{date}}",
+      "zh_CN": "创建于 {{date}}"
+    },
+    "last_used": {
+      "en": "Last used {{date}}",
+      "zh_CN": "最后使用 {{date}}"
+    }
+  },
+  "keyboard_shortcuts_help": {
+    "en": {
+      "title": "Keyboard Shortcuts",
+      "shortcuts": [
+        {
+          "keys": "Alt+S",
+          "action": "Quick save selected text"
+        },
+        {
+          "keys": "Alt+P",
+          "action": "Open prompt picker"
+        },
+        {
+          "keys": "Esc",
+          "action": "Close popup/picker"
+        },
+        {
+          "keys": "↑ / ↓",
+          "action": "Navigate prompts"
+        },
+        {
+          "keys": "Enter",
+          "action": "Select highlighted prompt"
+        }
+      ],
+      "footer": "Customize shortcuts at chrome://extensions/shortcuts"
+    },
+    "zh_CN": {
+      "title": "键盘快捷键",
+      "shortcuts": [
+        {
+          "keys": "Alt+S",
+          "action": "快速保存选中文字"
+        },
+        {
+          "keys": "Alt+P",
+          "action": "打开提示词选择器"
+        },
+        {
+          "keys": "Esc",
+          "action": "关闭弹窗/选择器"
+        },
+        {
+          "keys": "↑ / ↓",
+          "action": "浏览提示词"
+        },
+        {
+          "keys": "Enter",
+          "action": "选择高亮的提示词"
+        }
+      ],
+      "footer": "在 chrome://extensions/shortcuts 自定义快捷键"
+    }
+  }
+}
