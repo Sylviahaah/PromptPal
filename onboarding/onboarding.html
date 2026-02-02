@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to PromptPal</title>
+    <link rel="stylesheet" href="onboarding.css">
+</head>
+
+<body>
+    <div class="onboarding-container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen active">
+            <div class="welcome-content">
+                <div class="logo">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                </div>
+                <h1>Welcome to PromptPal! 🎉</h1>
+                <p class="subtitle">Your AI prompt library, simplified</p>
+
+                <div class="features">
+                    <div class="feature">
+                        <span class="icon">💾</span>
+                        <h3>Save Anywhere</h3>
+                        <p>Right-click selected text or press Alt+S</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">⚡</span>
+                        <h3>Insert Instantly</h3>
+                        <p>Press Alt+P to access your prompts</p>
+                    </div>
+                    <div class="feature">
+                        <span class="icon">📚</span>
+                        <h3>Organize Easily</h3>
+                        <p>Search, filter, and categorize your library</p>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="start-tutorial-btn" class="btn btn-primary">Start Quick Tutorial</button>
+                    <button id="skip-tutorial-btn" class="btn btn-secondary">Skip Tutorial</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tutorial Steps -->
+        <div id="tutorial-screen" class="screen">
+            <div class="tutorial-content">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="step-indicator">
+                    <span id="current-step">1</span> of <span id="total-steps">4</span>
+                </div>
+
+                <!-- Step 1 -->
+                <div class="tutorial-step active" data-step="1">
+                    <h2>Step 1: Save Your First Prompt</h2>
+                    <p>Try selecting some text on any webpage and right-click to choose <strong>"Save to Prompt
+                            Library"</strong></p>
+                    <div class="demo-box">
+                        <p>Select this text to practice: "Write a professional email requesting a meeting"</p>
+                    </div>
+                    <div class="tip">💡 Tip: You can also press <kbd>Alt</kbd> + <kbd>S</kbd> to quick save</div>
+                    <button class="btn btn-primary" id="step1-continue">Next →</button>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="tutorial-step" data-step="2">
+                    <h2>Step 2: Quick Save with Keyboard</h2>
+                    <p>For faster workflow, try the keyboard shortcut!</p>
+                    <div class="shortcut-demo">
+                        <div class="key-combo">
+                            <kbd>Alt</kbd> + <kbd>S</kbd>
+                        </div>
+                        <p>Saves selected text instantly</p>
+                    </div>
+                    <button class="btn btn-primary" id="step2-continue">I understand →</button>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="tutorial-step" data-step="3">
+                    <h2>Step 3: Insert Saved Prompts</h2>
+                    <p>When you need to use a prompt, press <kbd>Alt</kbd> + <kbd>P</kbd> to see your library</p>
+                    <div class="shortcut-demo">
+                        <div class="key-combo">
+                            <kbd>Alt</kbd> + <kbd>P</kbd>
+                        </div>
+                        <p>Opens floating prompt selector</p>
+                    </div>
+                    <div class="tip">💡 Tip: Click any prompt in the selector to insert it instantly</div>
+                    <button class="btn btn-primary" id="step3-continue">Got it! →</button>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="tutorial-step" data-step="4">
+                    <h2>Step 4: Manage Your Library</h2>
+                    <p>Click the PromptPal icon in your toolbar to:</p>
+                    <ul>
+                        <li>Quick save from the popup</li>
+                        <li>View recent prompts</li>
+                        <li>Access full library manager</li>
+                        <li>Change settings</li>
+                    </ul>
+                    <img src="../icons/icon-48.png" alt="PromptPal Icon" class="icon-demo">
+                    <button class="btn btn-primary" id="step4-finish">Start Using PromptPal!</button>
+                </div>
+
+                <button id="skip-step-btn" class="btn-text">Skip Tutorial</button>
+            </div>
+        </div>
+
+        <!-- Completion Screen -->
+        <div id="completion-screen" class="screen">
+            <div class="completion-content">
+                <div class="success-icon">✨</div>
+                <h1>You're All Set!</h1>
+                <p>We've added some sample prompts to get you started.</p>
+
+                <div class="next-steps">
+                    <h3>What's Next?</h3>
+                    <div class="action-card" id="open-manager">
+                        <span class="icon">📚</span>
+                        <div>
+                            <strong>View Your Library</strong>
+                            <p>See the sample prompts we added</p>
+                        </div>
+                    </div>
+                    <div class="action-card" id="open-settings">
+                        <span class="icon">⚙️</span>
+                        <div>
+                            <strong>Customize Settings</strong>
+                            <p>Choose your language, save mode, and more</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="close-onboarding-btn" class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../lib/storage.js"></script>
+    <script src="onboarding.js"></script>
+</body>
+
+</html>

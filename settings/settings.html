@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="settings">Settings</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+
+<body>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <h1 data-i18n="settings">Settings</h1>
+            <div class="header-actions">
+                <button id="help-btn" class="icon-btn" title="Help" aria-label="Help">
+                    <span class="icon">?</span>
+                </button>
+                <button id="close-btn" class="icon-btn" title="Close" aria-label="Close">
+                    <span class="icon">✕</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Settings Content -->
+        <main class="settings-content">
+
+            <!-- Save Preferences -->
+            <section class="settings-section">
+                <h2 data-i18n="settings_save_preferences">Save Preferences</h2>
+
+                <div class="setting-item">
+                    <label for="save-mode" data-i18n="save_mode_label">Default save mode</label>
+                    <select id="save-mode">
+                        <option value="detailed" data-i18n="save_mode_detailed">Detailed (confirm each save)</option>
+                        <option value="quick" data-i18n="save_mode_quick">Quick (no confirmation)</option>
+                    </select>
+                    <p class="setting-description">Choose how prompts are saved from context menu and keyboard
+                        shortcuts.</p>
+                </div>
+            </section>
+
+            <!-- Display & Language -->
+            <section class="settings-section">
+                <h2 data-i18n="settings_display_language">Display & Language</h2>
+
+                <div class="setting-item">
+                    <label for="language" data-i18n="language_label">Interface language</label>
+                    <select id="language">
+                        <option value="auto" data-i18n="language_auto">Follow browser</option>
+                        <option value="en" data-i18n="language_en">English</option>
+                        <option value="zh_CN" data-i18n="language_zh_cn">简体中文</option>
+                    </select>
+                    <p class="setting-description">Changes take effect immediately.</p>
+                </div>
+
+                <div class="setting-item">
+                    <label for="theme">Theme</label>
+                    <select id="theme">
+                        <option value="auto">Auto (follow system)</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                    <p class="setting-description">Theme preference (coming soon).</p>
+                </div>
+            </section>
+
+            <!-- Keyboard Shortcuts -->
+            <section class="settings-section">
+                <h2 data-i18n="settings_keyboard_shortcuts">Keyboard Shortcuts</h2>
+
+                <!-- Shortcut Status (dynamic) -->
+                <div id="shortcut-status" class="shortcut-status">
+                    <!-- Status loaded by JavaScript -->
+                </div>
+
+                <div class="shortcuts-list">
+                    <div class="shortcut-item">
+                        <div class="shortcut-action">
+                            <strong data-i18n="command_save_selection">Quick save selected text</strong>
+                        </div>
+                        <div class="shortcut-key">
+                            <kbd>Alt</kbd> + <kbd>S</kbd>
+                        </div>
+                    </div>
+
+                    <div class="shortcut-item">
+                        <div class="shortcut-action">
+                            <strong data-i18n="command_insert_prompt">Insert saved prompt</strong>
+                        </div>
+                        <div class="shortcut-key">
+                            <kbd>Alt</kbd> + <kbd>P</kbd>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="setting-note">
+                    💡 To customize shortcuts, go to <code>chrome://extensions/shortcuts</code>
+                </p>
+            </section>
+
+            <!-- Data Management -->
+            <section class="settings-section">
+                <h2 data-i18n="settings_data_management">Data Management</h2>
+
+                <div class="button-group">
+                    <button id="export-btn" class="btn btn-secondary" data-i18n="export_data">
+                        Export Prompts
+                    </button>
+                    <button id="import-btn" class="btn btn-secondary" data-i18n="import_data">
+                        Import Prompts
+                    </button>
+                </div>
+
+                <div class="setting-item danger-zone">
+                    <button id="clear-btn" class="btn btn-danger" data-i18n="clear_all_data">
+                        Clear All Data
+                    </button>
+                    <p class="setting-description">⚠️ This will permanently delete all your saved prompts.</p>
+                </div>
+            </section>
+
+            <!-- About -->
+            <section class="settings-section">
+                <h2>About</h2>
+                <div class="about-info">
+                    <p><strong>PromptPal</strong> v1.0.0</p>
+                    <p>Effortless prompt management for AI beginners.</p>
+                    <p class="credits">Made with ❤️ by the PromptPal team</p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Success Toast -->
+        <div id="toast" class="toast" style="display: none;"></div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="import-file" accept=".json" style="display: none;">
+
+    <script src="../lib/storage.js"></script>
+    <script src="../lib/shortcuts.js"></script>
+    <script src="../lib/i18n.js"></script>
+    <script src="../lib/help_system.js"></script>
+    <script src="settings.js"></script>
+</body>
+
+</html>

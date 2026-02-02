@@ -1,0 +1,415 @@
+/* PromptPal Settings Page Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f9fafb;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #0f172a;
+        color: #f1f5f9;
+    }
+}
+
+.settings-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+    .settings-header {
+        border-bottom-color: #1e293b;
+    }
+}
+
+.settings-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #4F46E5;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+@media (prefers-color-scheme: dark) {
+    .icon-btn {
+        color: #94a3b8;
+    }
+
+    .icon-btn:hover {
+        background: #1e293b;
+        color: #f1f5f9;
+    }
+}
+
+/* Settings Content */
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.settings-section {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    .settings-section {
+        background: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.settings-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #1f2937;
+}
+
+@media (prefers-color-scheme: dark) {
+    .settings-section h2 {
+        color: #f1f5f9;
+    }
+}
+
+/* Setting Items */
+.setting-item {
+    margin-bottom: 20px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-item label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+    .setting-item label {
+        color: #cbd5e1;
+    }
+}
+
+.setting-item select {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.setting-item select:focus {
+    outline: none;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .setting-item select {
+        background: #0f172a;
+        border-color: #334155;
+        color: #f1f5f9;
+    }
+
+    .setting-item select:focus {
+        border-color: #4F46E5;
+    }
+}
+
+.setting-description {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .setting-description {
+        color: #94a3b8;
+    }
+}
+
+.setting-note {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 12px;
+    padding: 12px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    border-left: 3px solid #4F46E5;
+}
+
+@media (prefers-color-scheme: dark) {
+    .setting-note {
+        background: #0f172a;
+        color: #94a3b8;
+    }
+}
+
+.setting-note code {
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+    .setting-note code {
+        background: #1e293b;
+    }
+}
+
+/* Keyboard Shortcuts */
+.shortcuts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .shortcut-item {
+        background: #0f172a;
+    }
+}
+
+.shortcut-action strong {
+    font-size: 14px;
+    color: #1f2937;
+}
+
+@media (prefers-color-scheme: dark) {
+    .shortcut-action strong {
+        color: #f1f5f9;
+    }
+}
+
+.shortcut-key {
+    display: flex;
+    gap: 6px;
+}
+
+.shortcut-key kbd {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    .shortcut-key kbd {
+        background: #1e293b;
+        border-color: #334155;
+        color: #cbd5e1;
+    }
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn-secondary {
+        background: #334155;
+        color: #f1f5f9;
+    }
+
+    .btn-secondary:hover {
+        background: #475569;
+    }
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.btn-danger:hover {
+    background: #fecaca;
+    border-color: #fca5a5;
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn-danger {
+        background: #7f1d1d;
+        color: #fca5a5;
+        border-color: #991b1b;
+    }
+
+    .btn-danger:hover {
+        background: #991b1b;
+    }
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.danger-zone {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+    .danger-zone {
+        border-top-color: #334155;
+    }
+}
+
+/* About */
+.about-info {
+    font-size: 14px;
+}
+
+.about-info p {
+    margin-bottom: 8px;
+}
+
+.about-info strong {
+    color: #4F46E5;
+}
+
+.credits {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .credits {
+        border-top-color: #334155;
+        color: #94a3b8;
+    }
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #10B981;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    animation: slideIn 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.error {
+    background: #EF4444;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .settings-container {
+        padding: 16px;
+    }
+
+    .settings-header h1 {
+        font-size: 24px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .shortcut-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

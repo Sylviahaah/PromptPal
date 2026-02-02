@@ -1,0 +1,292 @@
+{
+    "extension_name": {
+        "message": "PromptPal",
+        "description": "Extension name"
+    },
+    "extension_description": {
+        "message": "Effortless prompt management for AI beginners. Save, organize, and insert prompts with one click.",
+        "description": "Extension description"
+    },
+    "command_save_selection": {
+        "message": "Quick save selected text",
+        "description": "Keyboard shortcut description for Alt+S"
+    },
+    "command_insert_prompt": {
+        "message": "Insert saved prompt",
+        "description": "Keyboard shortcut description for Alt+P"
+    },
+    "context_menu_save": {
+        "message": "Save to Prompt Library",
+        "description": "Context menu item to save selection"
+    },
+    "context_menu_insert": {
+        "message": "Insert Prompt...",
+        "description": "Context menu item to insert prompt"
+    },
+    "context_menu_manage": {
+        "message": "Manage Prompt Library",
+        "description": "Context menu item to open manager"
+    },
+    "quick_save_placeholder": {
+        "message": "Paste prompt content and save...",
+        "description": "Placeholder for quick save textarea"
+    },
+    "save_button": {
+        "message": "Save",
+        "description": "Save button label"
+    },
+    "cancel_button": {
+        "message": "Cancel",
+        "description": "Cancel button label"
+    },
+    "recent_prompts": {
+        "message": "Recently Used",
+        "description": "Section header for recent prompts"
+    },
+    "pinned_prompts": {
+        "message": "Pinned",
+        "description": "Section header for pinned prompts"
+    },
+    "view_all_prompts": {
+        "message": "View All Prompts",
+        "description": "Link to full manager"
+    },
+    "empty_state_title": {
+        "message": "No prompts yet",
+        "description": "Empty state title"
+    },
+    "empty_state_message": {
+        "message": "Select text on any page, right-click, and choose 'Save to Prompt Library' to get started.",
+        "description": "Empty state instructions"
+    },
+    "settings": {
+        "message": "Settings",
+        "description": "Settings page title"
+    },
+    "settings_save_preferences": {
+        "message": "Save Preferences",
+        "description": "Settings section title"
+    },
+    "settings_keyboard_shortcuts": {
+        "message": "Keyboard Shortcuts",
+        "description": "Settings section title"
+    },
+    "settings_display_language": {
+        "message": "Display & Language",
+        "description": "Settings section title"
+    },
+    "settings_data_management": {
+        "message": "Data Management",
+        "description": "Settings section title"
+    },
+    "settings_premium_features": {
+        "message": "Premium Features",
+        "description": "Settings section title"
+    },
+    "save_mode_label": {
+        "message": "Default save mode",
+        "description": "Save mode setting label"
+    },
+    "save_mode_detailed": {
+        "message": "Detailed (confirm each save)",
+        "description": "Detailed save mode option"
+    },
+    "save_mode_quick": {
+        "message": "Quick (no confirmation)",
+        "description": "Quick save mode option"
+    },
+    "language_label": {
+        "message": "Interface language",
+        "description": "Language setting label"
+    },
+    "language_auto": {
+        "message": "Follow browser",
+        "description": "Auto language option"
+    },
+    "language_en": {
+        "message": "English",
+        "description": "English language option"
+    },
+    "language_zh_cn": {
+        "message": "简体中文",
+        "description": "Simplified Chinese option"
+    },
+    "export_data": {
+        "message": "Export Prompts",
+        "description": "Export button label"
+    },
+    "import_data": {
+        "message": "Import Prompts",
+        "description": "Import button label"
+    },
+    "clear_all_data": {
+        "message": "Clear All Data",
+        "description": "Clear data button label"
+    },
+    "clear_confirm_title": {
+        "message": "Delete everything?",
+        "description": "Clear data confirmation title"
+    },
+    "clear_confirm_message": {
+        "message": "This will permanently delete all your saved prompts. This action cannot be undone.",
+        "description": "Clear data confirmation message"
+    },
+    "premium_upgrade": {
+        "message": "Upgrade to Premium",
+        "description": "Premium upgrade button"
+    },
+    "premium_modal_title": {
+        "message": "Unlock Smart Features",
+        "description": "Premium modal title"
+    },
+    "premium_modal_description": {
+        "message": "You've used all 3 free auto-tagging attempts. Upgrade for unlimited smart categorization, cross-device sync, and more.",
+        "description": "Premium modal description"
+    },
+    "premium_feature_auto_tagging": {
+        "message": "Unlimited Auto-Tagging",
+        "description": "Premium feature name"
+    },
+    "premium_feature_sync": {
+        "message": "Cross-Device Sync",
+        "description": "Premium feature name"
+    },
+    "premium_feature_backup": {
+        "message": "Cloud Backup",
+        "description": "Premium feature name"
+    },
+    "premium_skip": {
+        "message": "Skip for Now",
+        "description": "Skip premium upgrade button"
+    },
+    "premium_learn_more": {
+        "message": "Learn More",
+        "description": "Learn more about premium button"
+    },
+    "premium_upgrade_now": {
+        "message": "Upgrade Now",
+        "description": "Upgrade now button"
+    },
+    "premium_trial_count": {
+        "message": "Auto-tagging: $COUNT$ / 3 free uses",
+        "description": "Trial usage counter",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "2"
+            }
+        }
+    },
+    "onboarding_step1_title": {
+        "message": "Step 1: Save Prompts",
+        "description": "Onboarding step 1 title"
+    },
+    "onboarding_step1_description": {
+        "message": "Select text on any page, right-click, and choose 'Save to Prompt Library'",
+        "description": "Onboarding step 1 description"
+    },
+    "onboarding_step2_title": {
+        "message": "Step 2: Insert Prompts",
+        "description": "Onboarding step 2 title"
+    },
+    "onboarding_step2_description": {
+        "message": "Press Alt+P on AI sites to quickly insert your saved prompts",
+        "description": "Onboarding step 2 description"
+    },
+    "onboarding_step3_title": {
+        "message": "Step 3: Manage Library",
+        "description": "Onboarding step 3 title"
+    },
+    "onboarding_step3_description": {
+        "message": "Click 'View All Prompts' to organize and edit your collection",
+        "description": "Onboarding step 3 description"
+    },
+    "onboarding_got_it": {
+        "message": "Got It!",
+        "description": "Onboarding completion button"
+    },
+    "toast_saved": {
+        "message": "Prompt saved!",
+        "description": "Success toast message"
+    },
+    "toast_inserted": {
+        "message": "Prompt inserted",
+        "description": "Insert success toast"
+    },
+    "toast_deleted": {
+        "message": "Prompt deleted",
+        "description": "Delete success toast"
+    },
+    "toast_error": {
+        "message": "Oops! Something went wrong.",
+        "description": "Generic error toast"
+    },
+    "edit_prompt": {
+        "message": "Edit",
+        "description": "Edit button label"
+    },
+    "delete_prompt": {
+        "message": "Delete",
+        "description": "Delete button label"
+    },
+    "pin_prompt": {
+        "message": "Pin",
+        "description": "Pin button label"
+    },
+    "unpin_prompt": {
+        "message": "Unpin",
+        "description": "Unpin button label"
+    },
+    "search_placeholder": {
+        "message": "Search prompts...",
+        "description": "Search input placeholder"
+    },
+    "sort_by_date": {
+        "message": "Date",
+        "description": "Sort by date option"
+    },
+    "sort_by_usage": {
+        "message": "Usage",
+        "description": "Sort by usage option"
+    },
+    "sort_by_title": {
+        "message": "Title",
+        "description": "Sort by title option"
+    },
+    "prompt_title_label": {
+        "message": "Title",
+        "description": "Prompt title field label"
+    },
+    "prompt_content_label": {
+        "message": "Content",
+        "description": "Prompt content field label"
+    },
+    "prompt_category_label": {
+        "message": "Category",
+        "description": "Prompt category field label"
+    },
+    "prompt_tags_label": {
+        "message": "Tags",
+        "description": "Prompt tags field label"
+    },
+    "category_uncategorized": {
+        "message": "Uncategorized",
+        "description": "Default category name"
+    },
+    "category_writing": {
+        "message": "Writing",
+        "description": "Category name"
+    },
+    "category_coding": {
+        "message": "Coding",
+        "description": "Category name"
+    },
+    "category_analysis": {
+        "message": "Analysis",
+        "description": "Category name"
+    },
+    "category_marketing": {
+        "message": "Marketing",
+        "description": "Category name"
+    }
+}

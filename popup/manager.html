@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptPal - Prompt Library</title>
+    <link rel="stylesheet" href="manager.css">
+</head>
+
+<body>
+    <div class="manager-container">
+        <!-- Header -->
+        <header class="manager-header">
+            <div class="header-left">
+                <h1 data-i18n="extension_name">PromptPal</h1>
+                <span class="prompt-count" id="prompt-count">0 prompts</span>
+            </div>
+            <div class="header-right">
+                <button id="help-btn" class="icon-btn" title="Library Help" aria-label="Help">
+                    <span class="icon">?</span>
+                </button>
+                <button id="settings-btn" class="icon-btn" title="Settings" aria-label="Settings">
+                    <span class="icon">⚙️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search and Filter Bar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="search-input" data-i18n-placeholder="search_placeholder"
+                    placeholder="Search prompts...">
+            </div>
+
+            <div class="filter-controls">
+                <select id="sort-select">
+                    <option value="recent" data-i18n="sort_by_date">Date</option>
+                    <option value="usage" data-i18n="sort_by_usage">Usage</option>
+                    <option value="title" data-i18n="sort_by_title">Title</option>
+                </select>
+
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Prompts Grid -->
+        <main class="manager-content">
+            <div id="prompts-grid" class="prompts-grid">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                <h2 data-i18n="empty_state_title">No prompts yet</h2>
+                <p data-i18n="empty_state_message">Select text on any page, right-click, and choose 'Save to Prompt
+                    Library' to get started.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Prompt</h2>
+                <button id="close-modal" class="icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-title" data-i18n="prompt_title_label">Title</label>
+                    <input type="text" id="edit-title" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-content" data-i18n="prompt_content_label">Content</label>
+                    <textarea id="edit-content" class="form-textarea" rows="6"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-category" data-i18n="prompt_category_label">Category</label>
+                    <input type="text" id="edit-category" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-tags" data-i18n="prompt_tags_label">Tags</label>
+                    <input type="text" id="edit-tags" class="form-input" placeholder="Comma-separated">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancel-edit" class="btn btn-secondary" data-i18n="cancel_button">Cancel</button>
+                <button id="save-edit" class="btn btn-primary" data-i18n="save_button">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../lib/storage.js"></script>
+    <script src="../lib/i18n.js"></script>
+    <script src="../lib/help_system.js"></script>
+    <script src="manager.js"></script>
+</body>
+
+</html>

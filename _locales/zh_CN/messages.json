@@ -1,0 +1,292 @@
+{
+    "extension_name": {
+        "message": "PromptPal",
+        "description": "扩展名称"
+    },
+    "extension_description": {
+        "message": "为AI初学者打造的轻松提示词管理工具。一键保存、整理和插入提示词。",
+        "description": "扩展描述"
+    },
+    "command_save_selection": {
+        "message": "快速保存选中文本",
+        "description": "Alt+S 快捷键描述"
+    },
+    "command_insert_prompt": {
+        "message": "插入已保存的提示词",
+        "description": "Alt+P 快捷键描述"
+    },
+    "context_menu_save": {
+        "message": "保存到提示词库",
+        "description": "右键菜单保存选项"
+    },
+    "context_menu_insert": {
+        "message": "插入提示词...",
+        "description": "右键菜单插入选项"
+    },
+    "context_menu_manage": {
+        "message": "管理提示词库",
+        "description": "右键菜单管理选项"
+    },
+    "quick_save_placeholder": {
+        "message": "粘贴提示词内容并保存...",
+        "description": "快速保存文本框占位符"
+    },
+    "save_button": {
+        "message": "保存",
+        "description": "保存按钮"
+    },
+    "cancel_button": {
+        "message": "取消",
+        "description": "取消按钮"
+    },
+    "recent_prompts": {
+        "message": "最近使用",
+        "description": "最近提示词区域标题"
+    },
+    "pinned_prompts": {
+        "message": "已置顶",
+        "description": "置顶提示词区域标题"
+    },
+    "view_all_prompts": {
+        "message": "查看所有提示词",
+        "description": "查看全部链接"
+    },
+    "empty_state_title": {
+        "message": "还没有提示词",
+        "description": "空状态标题"
+    },
+    "empty_state_message": {
+        "message": "在任意页面选中文本,右键选择\"保存到提示词库\"即可开始使用。",
+        "description": "空状态说明"
+    },
+    "settings": {
+        "message": "设置",
+        "description": "设置页面标题"
+    },
+    "settings_save_preferences": {
+        "message": "保存偏好",
+        "description": "设置分类标题"
+    },
+    "settings_keyboard_shortcuts": {
+        "message": "键盘快捷键",
+        "description": "设置分类标题"
+    },
+    "settings_display_language": {
+        "message": "显示和语言",
+        "description": "设置分类标题"
+    },
+    "settings_data_management": {
+        "message": "数据管理",
+        "description": "设置分类标题"
+    },
+    "settings_premium_features": {
+        "message": "高级功能",
+        "description": "设置分类标题"
+    },
+    "save_mode_label": {
+        "message": "默认保存模式",
+        "description": "保存模式设置标签"
+    },
+    "save_mode_detailed": {
+        "message": "详细模式(每次确认)",
+        "description": "详细保存模式选项"
+    },
+    "save_mode_quick": {
+        "message": "快速模式(无需确认)",
+        "description": "快速保存模式选项"
+    },
+    "language_label": {
+        "message": "界面语言",
+        "description": "语言设置标签"
+    },
+    "language_auto": {
+        "message": "跟随浏览器",
+        "description": "自动语言选项"
+    },
+    "language_en": {
+        "message": "English",
+        "description": "英语选项"
+    },
+    "language_zh_cn": {
+        "message": "简体中文",
+        "description": "简体中文选项"
+    },
+    "export_data": {
+        "message": "导出提示词",
+        "description": "导出按钮"
+    },
+    "import_data": {
+        "message": "导入提示词",
+        "description": "导入按钮"
+    },
+    "clear_all_data": {
+        "message": "清空所有数据",
+        "description": "清空数据按钮"
+    },
+    "clear_confirm_title": {
+        "message": "删除所有内容?",
+        "description": "清空确认标题"
+    },
+    "clear_confirm_message": {
+        "message": "这将永久删除所有已保存的提示词。此操作不可撤销。",
+        "description": "清空确认消息"
+    },
+    "premium_upgrade": {
+        "message": "升级到高级版",
+        "description": "升级按钮"
+    },
+    "premium_modal_title": {
+        "message": "解锁智能功能",
+        "description": "高级版弹窗标题"
+    },
+    "premium_modal_description": {
+        "message": "您已用完3次免费自动标记。升级即可享受无限智能分类、跨设备同步等更多功能。",
+        "description": "高级版弹窗描述"
+    },
+    "premium_feature_auto_tagging": {
+        "message": "无限自动标记",
+        "description": "高级功能名称"
+    },
+    "premium_feature_sync": {
+        "message": "跨设备同步",
+        "description": "高级功能名称"
+    },
+    "premium_feature_backup": {
+        "message": "云端备份",
+        "description": "高级功能名称"
+    },
+    "premium_skip": {
+        "message": "暂时跳过",
+        "description": "跳过升级按钮"
+    },
+    "premium_learn_more": {
+        "message": "了解更多",
+        "description": "了解高级版按钮"
+    },
+    "premium_upgrade_now": {
+        "message": "立即升级",
+        "description": "立即升级按钮"
+    },
+    "premium_trial_count": {
+        "message": "自动标记: $COUNT$ / 3 次免费试用",
+        "description": "试用次数计数",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "2"
+            }
+        }
+    },
+    "onboarding_step1_title": {
+        "message": "第1步:保存提示词",
+        "description": "新手引导第1步标题"
+    },
+    "onboarding_step1_description": {
+        "message": "在任意页面选中文本,右键选择\"保存到提示词库\"",
+        "description": "新手引导第1步描述"
+    },
+    "onboarding_step2_title": {
+        "message": "第2步:插入提示词",
+        "description": "新手引导第2步标题"
+    },
+    "onboarding_step2_description": {
+        "message": "在AI网站按下 Alt+P 快速插入已保存的提示词",
+        "description": "新手引导第2步描述"
+    },
+    "onboarding_step3_title": {
+        "message": "第3步:管理提示词库",
+        "description": "新手引导第3步标题"
+    },
+    "onboarding_step3_description": {
+        "message": "点击\"查看所有提示词\"来整理和编辑您的收藏",
+        "description": "新手引导第3步描述"
+    },
+    "onboarding_got_it": {
+        "message": "知道了!",
+        "description": "新手引导完成按钮"
+    },
+    "toast_saved": {
+        "message": "提示词已保存!",
+        "description": "保存成功提示"
+    },
+    "toast_inserted": {
+        "message": "提示词已插入",
+        "description": "插入成功提示"
+    },
+    "toast_deleted": {
+        "message": "提示词已删除",
+        "description": "删除成功提示"
+    },
+    "toast_error": {
+        "message": "哎呀!出错了。",
+        "description": "通用错误提示"
+    },
+    "edit_prompt": {
+        "message": "编辑",
+        "description": "编辑按钮"
+    },
+    "delete_prompt": {
+        "message": "删除",
+        "description": "删除按钮"
+    },
+    "pin_prompt": {
+        "message": "置顶",
+        "description": "置顶按钮"
+    },
+    "unpin_prompt": {
+        "message": "取消置顶",
+        "description": "取消置顶按钮"
+    },
+    "search_placeholder": {
+        "message": "搜索提示词...",
+        "description": "搜索框占位符"
+    },
+    "sort_by_date": {
+        "message": "日期",
+        "description": "按日期排序"
+    },
+    "sort_by_usage": {
+        "message": "使用次数",
+        "description": "按使用次数排序"
+    },
+    "sort_by_title": {
+        "message": "标题",
+        "description": "按标题排序"
+    },
+    "prompt_title_label": {
+        "message": "标题",
+        "description": "提示词标题字段"
+    },
+    "prompt_content_label": {
+        "message": "内容",
+        "description": "提示词内容字段"
+    },
+    "prompt_category_label": {
+        "message": "分类",
+        "description": "提示词分类字段"
+    },
+    "prompt_tags_label": {
+        "message": "标签",
+        "description": "提示词标签字段"
+    },
+    "category_uncategorized": {
+        "message": "未分类",
+        "description": "默认分类名称"
+    },
+    "category_writing": {
+        "message": "写作",
+        "description": "分类名称"
+    },
+    "category_coding": {
+        "message": "编程",
+        "description": "分类名称"
+    },
+    "category_analysis": {
+        "message": "分析",
+        "description": "分类名称"
+    },
+    "category_marketing": {
+        "message": "营销",
+        "description": "分类名称"
+    }
+}

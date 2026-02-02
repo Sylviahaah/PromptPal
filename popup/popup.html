@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PromptPal</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <h1 data-i18n="extension_name">PromptPal</h1>
+      <div class="header-actions">
+        <button id="help-btn" class="icon-btn" title="Help" aria-label="Help">
+          <span class="icon">?</span>
+        </button>
+        <button id="settings-btn" class="icon-btn" title="Settings" aria-label="Settings">
+          <span class="icon">⚙️</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Quick Save Section -->
+    <section class="quick-save-section">
+      <textarea id="quick-save-input" data-i18n-placeholder="quick_save_placeholder"
+        placeholder="Paste prompt content and save..." rows="3"></textarea>
+      <button id="save-btn" class="btn btn-primary" data-i18n="save_button">Save</button>
+    </section>
+
+    <!-- Recent/Pinned Prompts Section -->
+    <section class="prompts-section">
+      <h2 data-i18n="recent_prompts">Recently Used</h2>
+      <div id="prompts-list" class="prompts-list">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+          </path>
+        </svg>
+        <p class="empty-title" data-i18n="empty_state_title">No prompts yet</p>
+        <p class="empty-message" data-i18n="empty_state_message">Select text on any page, right-click, and choose 'Save
+          to Prompt Library' to get started.</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <a href="manager.html" id="view-all-link" data-i18n="view_all_prompts">View All Prompts</a>
+    </footer>
+  </div>
+
+  <script src="../lib/storage.js"></script>
+  <script src="../lib/i18n.js"></script>
+  <script src="../lib/help_system.js"></script>
+  <script src="popup.js"></script>
+</body>
+
+</html>

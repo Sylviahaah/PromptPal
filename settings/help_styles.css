@@ -1,0 +1,59 @@
+/* Help and Tutorial Replay Styles */
+
+.settings-section .button-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.settings-section .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Help icon button in popup */
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    color: var(--text-secondary);
+}
+
+.icon-btn:hover {
+    background-color: var(--hover-bg);
+    color: var(--primary-color);
+}
+
+.icon-btn:active {
+    transform: scale(0.95);
+}
+
+/* Tutorial button styling */
+#replay-onboarding-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#replay-onboarding-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#replay-onboarding-btn:active {
+    transform: translateY(0);
+}
