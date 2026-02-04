@@ -446,22 +446,37 @@ function buildFloatingUIHTML(displayPrompts) {
         `;
     } else {
         displayPrompts.forEach((prompt, index) => {
-            const truncatedTitle = prompt.title.length > 40
-                ? prompt.title.substring(0, 37) + '...'
+            const truncatedTitle = prompt.title.length > 35
+                ? prompt.title.substring(0, 32) + '...'
                 : prompt.title;
 
             html += `
-                <div class="promptpal-item" data-prompt-id="${prompt.id}" data-index="${index}">
+                <div class="promptpal-item" 
+                     data-prompt-id="${prompt.id}" 
+                     data-index="${index}"
+                     role="option"
+                     aria-selected="false"
+                     tabindex="-1">
                     ${prompt.isPinned ? '<span class="pin-icon">📌</span>' : ''}
                     <span class="prompt-title">${escapeHtml(truncatedTitle)}</span>
-                    <span class="promptpal-edit-hint">✏️</span>
+                    <div class="promptpal-actions">
+                        <button class="promptpal-action-btn" data-action="pin" title="${prompt.isPinned ? 'Unpin' : 'Pin'}">
+                            ${prompt.isPinned ? '📌' : '📍'}
+                        </button>
+                        <button class="promptpal-action-btn" data-action="edit" title="Edit">
+                            ✏️
+                        </button>
+                        <button class="promptpal-action-btn promptpal-action-delete" data-action="delete" title="Delete">
+                            🗑️
+                        </button>
+                    </div>
                 </div>
             `;
         });
     }
 
     html += '</div>';
-    html += '<div class="promptpal-footer">ESC close • ↑↓ navigate • Enter insert • Dbl-click edit</div>';
+    html += '<div class="promptpal-footer">ESC close • ↑↓ navigate • Enter/click insert • Dbl-click edit</div>';
 
     return html;
 }
@@ -594,84 +609,304 @@ function positionFloatingUI(inputElement) {
  * Setup floating UI event listeners
  */
 function setupFloatingUIListeners(prompts) {
-    // Track double-click state per item
-    let pendingDoubleClick = {};
+    // ============================================
+    // UNIFIED STATE MANAGEMENT
+    // ============================================
+    let selectedIndex = 0;
+    let hoverDebounceTimer = null;
+    const HOVER_DEBOUNCE_MS = 100;
+    const CLICK_DOUBLE_DELAY = 200;
 
-    // Click on item - immediate insert, unless double-click detected
-    floatingUI.querySelectorAll('.promptpal-item').forEach((item, index) => {
-        const promptId = item.getAttribute('data-prompt-id');
-        // Look up from allFloatingPrompts (full list), not filtered prompts
-        const prompt = allFloatingPrompts.find(p => p.id === promptId);
+    // Get current items (re-query after search filtering)
+    const getItems = () => Array.from(floatingUI.querySelectorAll('.promptpal-item'));
+    const getPromptById = (id) => allFloatingPrompts.find(p => p.id === id);
 
-        // Single click handler - immediate insert
-        item.addEventListener('click', (e) => {
+    // ============================================
+    // SELECTION STATE - SINGLE SOURCE OF TRUTH
+    // ============================================
+    function updateSelection(newIndex, options = {}) {
+        const items = getItems();
+        if (items.length === 0) return;
+
+        // Clamp or wrap index
+        if (options.wrap) {
+            selectedIndex = ((newIndex % items.length) + items.length) % items.length;
+        } else {
+            selectedIndex = Math.max(0, Math.min(newIndex, items.length - 1));
+        }
+
+        // Update visual state
+        items.forEach((item, index) => {
+            const isSelected = index === selectedIndex;
+            item.classList.toggle('selected', isSelected);
+            item.setAttribute('aria-selected', isSelected);
+        });
+
+        // Scroll into view
+        const selectedItem = items[selectedIndex];
+        if (selectedItem) {
+            selectedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+            // Show preview for selected item (if not from rapid mouse movement)
+            if (!options.skipPreview) {
+                const promptId = selectedItem.getAttribute('data-prompt-id');
+                const prompt = getPromptById(promptId);
+                if (prompt) {
+                    showPreviewTooltip(selectedItem, prompt);
+                }
+            }
+        }
+    }
+
+    // Initialize first item as selected
+    updateSelection(0, { skipPreview: true });
+
+    // ============================================
+    // EVENT DELEGATION ON LIST CONTAINER
+    // ============================================
+    const listContainer = floatingUI.querySelector('#promptpal-list');
+    if (!listContainer) return;
+
+    // Track pending actions
+    let pendingClick = null;
+
+    // --- MOUSE ENTER (hover) - debounced ---
+    listContainer.addEventListener('mouseenter', (e) => {
+        const item = e.target.closest('.promptpal-item');
+        if (!item) return;
+
+        // Debounce rapid mouse movements
+        if (hoverDebounceTimer) clearTimeout(hoverDebounceTimer);
+        hoverDebounceTimer = setTimeout(() => {
+            const index = parseInt(item.dataset.index, 10);
+            if (!isNaN(index) && index !== selectedIndex) {
+                updateSelection(index);
+            }
+        }, HOVER_DEBOUNCE_MS);
+    }, true);
+
+    // --- MOUSE LEAVE - hide preview ---
+    listContainer.addEventListener('mouseleave', (e) => {
+        const item = e.target.closest('.promptpal-item');
+        if (item) {
+            if (hoverDebounceTimer) clearTimeout(hoverDebounceTimer);
+            hidePreviewTooltip();
+        }
+    }, true);
+
+    // --- CLICK - insert prompt (with double-click detection) ---
+    listContainer.addEventListener('click', (e) => {
+        const item = e.target.closest('.promptpal-item');
+        if (!item) return;
+
+        // Check if clicked on action button
+        const actionBtn = e.target.closest('.promptpal-action-btn');
+        if (actionBtn) {
             e.preventDefault();
             e.stopPropagation();
+            handleQuickAction(actionBtn, item);
+            return;
+        }
 
-            // Skip if this was part of a double-click
-            if (pendingDoubleClick[promptId]) {
-                pendingDoubleClick[promptId] = false;
-                return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const promptId = item.dataset.promptId;
+
+        // Double-click detection
+        if (pendingClick && pendingClick.promptId === promptId) {
+            clearTimeout(pendingClick.timer);
+            pendingClick = null;
+            // Double click - open edit
+            const prompt = getPromptById(promptId);
+            if (prompt) {
+                console.log('[PromptPal] Double-click: opening edit modal');
+                openFloatingEditModal(prompt);
             }
+            return;
+        }
 
-            // Small delay to detect if double-click is coming (150ms is fast enough)
-            pendingDoubleClick[promptId] = true;
-            setTimeout(() => {
-                if (pendingDoubleClick[promptId]) {
-                    pendingDoubleClick[promptId] = false;
+        // Schedule single click action
+        pendingClick = {
+            promptId,
+            timer: setTimeout(() => {
+                pendingClick = null;
+                const prompt = getPromptById(promptId);
+                if (prompt) {
                     handlePromptInsert(prompt);
                 }
-            }, 150);
-        });
-
-        // Double click handler - open edit
-        item.addEventListener('dblclick', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Cancel pending insert
-            pendingDoubleClick[promptId] = false;
-
-            console.log('[PromptPal] Double-click detected, opening edit modal');
-            openFloatingEditModal(prompt);
-        });
-
-        // Hover preview handlers with delay
-        let showPreviewTimer = null;
-
-        item.addEventListener('mouseenter', () => {
-            // Cancel any pending hide
-            if (hideTooltipTimer) {
-                clearTimeout(hideTooltipTimer);
-                hideTooltipTimer = null;
-            }
-            // Show after 200ms delay
-            showPreviewTimer = setTimeout(() => {
-                showPreviewTooltip(item, prompt);
-            }, 200);
-        });
-
-        item.addEventListener('mouseleave', () => {
-            // Cancel pending show
-            if (showPreviewTimer) {
-                clearTimeout(showPreviewTimer);
-                showPreviewTimer = null;
-            }
-            hidePreviewTooltip();
-        });
+            }, CLICK_DOUBLE_DELAY)
+        };
     });
 
-    // Keyboard navigation
-    let selectedIndex = 0;
-    const items = Array.from(floatingUI.querySelectorAll('.promptpal-item'));
+    // --- RIGHT CLICK - context menu ---
+    listContainer.addEventListener('contextmenu', (e) => {
+        const item = e.target.closest('.promptpal-item');
+        if (!item) return;
 
-    // Remove previous keydown listener if exists
+        e.preventDefault();
+        e.stopPropagation();
+
+        const promptId = item.dataset.promptId;
+        const prompt = getPromptById(promptId);
+        if (prompt) {
+            showContextMenu(e.clientX, e.clientY, prompt, item);
+        }
+    });
+
+    // ============================================
+    // QUICK ACTION BUTTONS HANDLER
+    // ============================================
+    function handleQuickAction(btn, item) {
+        const action = btn.dataset.action;
+        const promptId = item.dataset.promptId;
+        const prompt = getPromptById(promptId);
+        if (!prompt) return;
+
+        switch (action) {
+            case 'pin':
+                togglePin(prompt, item);
+                break;
+            case 'edit':
+                openFloatingEditModal(prompt);
+                break;
+            case 'delete':
+                deletePromptWithConfirm(prompt);
+                break;
+        }
+    }
+
+    async function togglePin(prompt, item) {
+        try {
+            prompt.isPinned = !prompt.isPinned;
+            await chrome.runtime.sendMessage({
+                action: 'update_prompt',
+                prompt: prompt
+            });
+
+            // Update pin icon
+            const pinIcon = item.querySelector('.pin-icon');
+            const pinBtn = item.querySelector('[data-action="pin"]');
+
+            if (prompt.isPinned) {
+                if (!pinIcon) {
+                    const icon = document.createElement('span');
+                    icon.className = 'pin-icon';
+                    icon.textContent = '📌';
+                    item.insertBefore(icon, item.firstChild);
+                }
+                if (pinBtn) pinBtn.textContent = '📌';
+            } else {
+                if (pinIcon) pinIcon.remove();
+                if (pinBtn) pinBtn.textContent = '📍';
+            }
+
+            showToast(prompt.isPinned ? 'Pinned' : 'Unpinned', 'success');
+        } catch (err) {
+            console.error('[PromptPal] Pin toggle failed:', err);
+            showToast('Failed to update', 'error');
+        }
+    }
+
+    async function deletePromptWithConfirm(prompt) {
+        if (!confirm(`Delete "${prompt.title}"?`)) return;
+
+        try {
+            await chrome.runtime.sendMessage({
+                action: 'delete_prompt',
+                promptId: prompt.id
+            });
+
+            // Remove from local array
+            const idx = allFloatingPrompts.findIndex(p => p.id === prompt.id);
+            if (idx > -1) allFloatingPrompts.splice(idx, 1);
+
+            // Refresh list
+            const filtered = getDisplayPrompts(allFloatingPrompts, currentSearchTerm);
+            updatePromptList(filtered);
+
+            showToast('Deleted', 'success');
+        } catch (err) {
+            console.error('[PromptPal] Delete failed:', err);
+            showToast('Delete failed', 'error');
+        }
+    }
+
+    // ============================================
+    // CONTEXT MENU
+    // ============================================
+    let contextMenu = null;
+
+    function showContextMenu(x, y, prompt, item) {
+        hideContextMenu();
+
+        contextMenu = document.createElement('div');
+        contextMenu.className = 'promptpal-context-menu';
+        contextMenu.innerHTML = `
+            <button class="context-item" data-action="insert">📥 Insert</button>
+            <button class="context-item" data-action="copy">📋 Copy</button>
+            <div class="context-divider"></div>
+            <button class="context-item" data-action="pin">${prompt.isPinned ? '📌 Unpin' : '📍 Pin to top'}</button>
+            <button class="context-item" data-action="edit">✏️ Edit</button>
+            <div class="context-divider"></div>
+            <button class="context-item context-item-danger" data-action="delete">🗑️ Delete</button>
+        `;
+
+        // Position within viewport
+        document.body.appendChild(contextMenu);
+        const menuRect = contextMenu.getBoundingClientRect();
+        const left = Math.min(x, window.innerWidth - menuRect.width - 10);
+        const top = Math.min(y, window.innerHeight - menuRect.height - 10);
+        contextMenu.style.left = `${left}px`;
+        contextMenu.style.top = `${top}px`;
+
+        // Handle clicks
+        contextMenu.addEventListener('click', (e) => {
+            const btn = e.target.closest('.context-item');
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            hideContextMenu();
+
+            switch (action) {
+                case 'insert':
+                    handlePromptInsert(prompt);
+                    break;
+                case 'copy':
+                    navigator.clipboard.writeText(prompt.content);
+                    showToast('Copied!', 'success');
+                    break;
+                case 'pin':
+                    togglePin(prompt, item);
+                    break;
+                case 'edit':
+                    openFloatingEditModal(prompt);
+                    break;
+                case 'delete':
+                    deletePromptWithConfirm(prompt);
+                    break;
+            }
+        });
+
+        // Close on outside click
+        setTimeout(() => {
+            document.addEventListener('click', hideContextMenu, { once: true });
+        }, 10);
+    }
+
+    function hideContextMenu() {
+        if (contextMenu) {
+            contextMenu.remove();
+            contextMenu = null;
+        }
+    }
+
+    // ============================================
+    // KEYBOARD NAVIGATION
+    // ============================================
     if (window.floatingUIKeydownHandler) {
         document.removeEventListener('keydown', window.floatingUIKeydownHandler);
     }
-
-    window.floatingUIKeydownHandler = handleFloatingUIKeydown;
-    document.addEventListener('keydown', handleFloatingUIKeydown);
 
     function handleFloatingUIKeydown(e) {
         if (!floatingUI || !document.body.contains(floatingUI)) {
@@ -679,73 +914,78 @@ function setupFloatingUIListeners(prompts) {
             return;
         }
 
-        // Ignore if typing in search
-        if (e.target.id === 'promptpal-search-input' && !['Escape', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
+        // Allow typing in search except for nav keys
+        const isSearchFocused = e.target.id === 'promptpal-search-input';
+        if (isSearchFocused && !['Escape', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
             return;
         }
 
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            e.stopPropagation();
-            document.removeEventListener('keydown', handleFloatingUIKeydown);
-            hidePreviewTooltip();
-            closeFloatingUI();
-        } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (items.length > 0) {
-                selectedIndex = (selectedIndex + 1) % items.length;
-                updateSelection();
-            }
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (items.length > 0) {
-                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-                updateSelection();
-            }
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (items[selectedIndex]) {
+        const items = getItems();
+
+        switch (e.key) {
+            case 'Escape':
+                e.preventDefault();
+                e.stopPropagation();
+                hideContextMenu();
+                document.removeEventListener('keydown', handleFloatingUIKeydown);
                 hidePreviewTooltip();
-                items[selectedIndex].click();
-            }
+                closeFloatingUI();
+                break;
+
+            case 'ArrowDown':
+                e.preventDefault();
+                if (items.length > 0) {
+                    updateSelection(selectedIndex + 1, { wrap: true });
+                }
+                break;
+
+            case 'ArrowUp':
+                e.preventDefault();
+                if (items.length > 0) {
+                    updateSelection(selectedIndex - 1, { wrap: true });
+                }
+                break;
+
+            case 'Enter':
+                e.preventDefault();
+                if (items[selectedIndex]) {
+                    hidePreviewTooltip();
+                    const promptId = items[selectedIndex].dataset.promptId;
+                    const prompt = getPromptById(promptId);
+                    if (prompt) {
+                        handlePromptInsert(prompt);
+                    }
+                }
+                break;
         }
     }
 
-    function updateSelection() {
-        items.forEach((item, index) => {
-            item.classList.toggle('selected', index === selectedIndex);
-        });
+    window.floatingUIKeydownHandler = handleFloatingUIKeydown;
+    document.addEventListener('keydown', handleFloatingUIKeydown);
 
-        // Scroll into view
-        items[selectedIndex]?.scrollIntoView({ block: 'nearest' });
-
-        // Show preview for selected item
-        const selectedItem = items[selectedIndex];
-        if (selectedItem) {
-            const promptId = selectedItem.getAttribute('data-prompt-id');
-            const prompt = prompts.find(p => p.id === promptId);
-            if (prompt) {
-                showPreviewTooltip(selectedItem, prompt);
-            }
-        }
-    }
-
-    // Click outside to close (with delay to prevent immediate close)
-    setTimeout(() => {
-        document.addEventListener('click', handleOutsideClick);
-    }, 100);
-
+    // ============================================
+    // CLICK OUTSIDE TO CLOSE
+    // ============================================
     function handleOutsideClick(e) {
+        // Don't close if clicking on context menu
+        if (contextMenu && contextMenu.contains(e.target)) return;
         // Don't close if clicking on edit modal
-        if (floatingEditModal && floatingEditModal.contains(e.target)) {
-            return;
-        }
+        if (floatingEditModal && floatingEditModal.contains(e.target)) return;
+        // Don't close if clicking on preview tooltip
+        const tooltip = document.getElementById('promptpal-preview-tooltip');
+        if (tooltip && tooltip.contains(e.target)) return;
+
         if (floatingUI && !floatingUI.contains(e.target)) {
             hidePreviewTooltip();
+            hideContextMenu();
             closeFloatingUI();
             document.removeEventListener('click', handleOutsideClick);
         }
     }
+
+    setTimeout(() => {
+        document.addEventListener('click', handleOutsideClick);
+    }, 100);
 }
 
 /**
@@ -1076,8 +1316,10 @@ function addFloatingUIStyles() {
       border-radius: 12px;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       width: 400px;
+      min-height: 300px;
       max-height: 500px;
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       color: #1f2937;
     }
@@ -1129,8 +1371,9 @@ function addFloatingUIStyles() {
     }
     
     .promptpal-list {
-      max-height: 400px;
+      flex: 1;
       overflow-y: auto;
+      min-height: 0;
     }
     
     .promptpal-item {
@@ -1170,6 +1413,139 @@ function addFloatingUIStyles() {
     .prompt-title {
       flex: 1;
       font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    /* Quick action buttons - hidden by default */
+    .promptpal-actions {
+      display: flex;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      margin-left: auto;
+    }
+    
+    .promptpal-item:hover .promptpal-actions,
+    .promptpal-item.selected .promptpal-actions {
+      opacity: 1;
+    }
+    
+    .promptpal-action-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      opacity: 0.6;
+      transition: all 0.15s ease;
+      min-width: 36px;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .promptpal-action-btn:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .promptpal-action-delete:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      
+      .promptpal-action-delete:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+    }
+    
+    /* Context menu */
+    .promptpal-context-menu {
+      position: fixed;
+      z-index: 1000002;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      padding: 6px;
+      min-width: 160px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-context-menu {
+        background: #1f2937;
+        border-color: #374151;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      }
+    }
+    
+    .context-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      color: #374151;
+      border-radius: 6px;
+      transition: background 0.15s;
+      text-align: left;
+    }
+    
+    .context-item:hover {
+      background: #f3f4f6;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .context-item {
+        color: #e5e7eb;
+      }
+      
+      .context-item:hover {
+        background: #374151;
+      }
+    }
+    
+    .context-item-danger {
+      color: #dc2626;
+    }
+    
+    .context-item-danger:hover {
+      background: rgba(220, 38, 38, 0.1);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .context-item-danger {
+        color: #f87171;
+      }
+      
+      .context-item-danger:hover {
+        background: rgba(248, 113, 113, 0.15);
+      }
+    }
+    
+    .context-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 4px 8px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .context-divider {
+        background: #374151;
+      }
     }
     
     .promptpal-footer {

@@ -253,6 +253,34 @@ function showToast(message, type = 'success') {
     }, 2500);
 }
 
+/**
+ * Check and display keyboard shortcuts status
+ */
+async function checkAndDisplayShortcuts() {
+    try {
+        const statusContainer = document.getElementById('shortcut-status');
+        if (!statusContainer) return;
+
+        // Use the functions from shortcuts.js
+        if (typeof checkShortcutConflicts === 'function') {
+            const status = await checkShortcutConflicts();
+            statusContainer.innerHTML = formatShortcutStatus(status);
+
+            // Add click handler for fix button if present
+            const fixBtn = document.getElementById('fix-shortcuts-btn');
+            if (fixBtn) {
+                fixBtn.addEventListener('click', () => {
+                    chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+                });
+            }
+        } else {
+            console.warn('[Settings] shortcut functions not loaded');
+        }
+    } catch (error) {
+        console.error('[Settings] Error checking shortcuts:', error);
+    }
+}
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
