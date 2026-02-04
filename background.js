@@ -110,31 +110,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 });
 
 /**
- * Keyboard command listener for Alt+S and Alt+P
- */
-chrome.commands.onCommand.addListener(async (command) => {
-    console.log('[Commands] Received command:', command);
-
-    try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-        if (!tab) {
-            console.error('[Commands] No active tab');
-            return;
-        }
-
-        if (command === 'save_selection') {
-            await handleAltSSave(tab);
-        } else if (command === 'insert_prompt') {
-            await handleInsertPrompt(tab);
-        }
-    } catch (error) {
-        console.error(`[Commands] Error handling ${command}:`, error);
-        showNotification('error', 'Shortcut failed: ' + error.message);
-    }
-});
-
-/**
  * Create context menu items
  */
 function createContextMenus() {
@@ -273,9 +248,13 @@ async function handleOpenManager() {
  * Handle keyboard shortcuts
  */
 chrome.commands.onCommand.addListener(async (command) => {
+    console.log('[Commands] Received command:', command);
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    if (!tab) return;
+    if (!tab) {
+        console.error('[Commands] No active tab');
+        return;
+    }
 
     switch (command) {
         case 'save_selection':

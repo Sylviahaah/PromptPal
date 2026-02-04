@@ -297,22 +297,16 @@ function insertText(text, target = null) {
 }
 
 /**
- * Get current text selection (with recursion guard)
+ * Get current text selection
+ * Renamed to avoid shadowing native window.getSelection()
  */
-let isGettingSelection = false;
-function getSelection() {
-    // Recursion guard
-    if (isGettingSelection) {
-        console.warn('[PromptPal] Recursive getSelection call blocked');
-        return '';
-    }
-
-    isGettingSelection = true;
+function getSelectedText() {
     try {
         const selection = window.getSelection();
         return selection ? selection.toString().trim() : '';
-    } finally {
-        isGettingSelection = false;
+    } catch (error) {
+        console.error('[PromptPal] Error getting selection:', error);
+        return '';
     }
 }
 
@@ -2661,7 +2655,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.action === 'get_selection') {
-        const text = getSelection();
+        const text = getSelectedText();
         sendResponse({ text });
         return true;
     }
