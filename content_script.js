@@ -636,12 +636,27 @@ function setupFloatingUIListeners(prompts) {
             openFloatingEditModal(prompt);
         });
 
-        // Hover preview handlers
+        // Hover preview handlers with delay
+        let showPreviewTimer = null;
+
         item.addEventListener('mouseenter', () => {
-            showPreviewTooltip(item, prompt);
+            // Cancel any pending hide
+            if (hideTooltipTimer) {
+                clearTimeout(hideTooltipTimer);
+                hideTooltipTimer = null;
+            }
+            // Show after 200ms delay
+            showPreviewTimer = setTimeout(() => {
+                showPreviewTooltip(item, prompt);
+            }, 200);
         });
 
         item.addEventListener('mouseleave', () => {
+            // Cancel pending show
+            if (showPreviewTimer) {
+                clearTimeout(showPreviewTimer);
+                showPreviewTimer = null;
+            }
             hidePreviewTooltip();
         });
     });
@@ -774,24 +789,35 @@ function handlePromptInsert(prompt) {
  * Show preview tooltip for a prompt item
  */
 function showPreviewTooltip(item, prompt) {
-    hidePreviewTooltip();
+    // Cancel any pending hide
+    if (hideTooltipTimer) {
+        clearTimeout(hideTooltipTimer);
+        hideTooltipTimer = null;
+    }
 
-    // Create tooltip if it doesn't exist
+    // Remove existing tooltip
+    const existing = document.getElementById('promptpal-preview-tooltip');
+    if (existing) existing.remove();
+
+    // Create tooltip
     previewTooltip = document.createElement('div');
     previewTooltip.id = 'promptpal-preview-tooltip';
     previewTooltip.className = 'promptpal-preview-tooltip';
 
-    // Build tooltip content
-    const contentPreview = prompt.content.length > 500
-        ? prompt.content.substring(0, 500) + '...'
-        : prompt.content;
+    // Format content with variable highlighting
+    let contentHtml = escapeHtml(prompt.content);
+    // Highlight [variables]
+    contentHtml = contentHtml.replace(/\[([^\]]+)\]/g,
+        '<span class="preview-variable">[$1]</span>');
+    // Preserve line breaks
+    contentHtml = contentHtml.replace(/\n/g, '<br>');
 
     previewTooltip.innerHTML = `
         <div class="preview-header">
             <strong>${escapeHtml(prompt.title)}</strong>
-            ${prompt.isPinned ? '<span class="pin-badge">📌 Pinned</span>' : ''}
+            ${prompt.isPinned ? '<span class="pin-badge">📌</span>' : ''}
         </div>
-        <div class="preview-content">${escapeHtml(contentPreview)}</div>
+        <div class="preview-content">${contentHtml}</div>
         ${prompt.tags && prompt.tags.length > 0 ? `
             <div class="preview-tags">
                 ${prompt.tags.map(t => `<span class="preview-tag">${escapeHtml(t)}</span>`).join('')}
@@ -804,13 +830,20 @@ function showPreviewTooltip(item, prompt) {
     // Position the tooltip
     positionPreviewTooltip(item);
 
+    // Fade in
+    requestAnimationFrame(() => {
+        previewTooltip.style.opacity = '1';
+    });
+
     // Allow hovering on tooltip itself
     previewTooltip.addEventListener('mouseenter', () => {
-        previewTooltip.dataset.hovered = 'true';
+        if (hideTooltipTimer) {
+            clearTimeout(hideTooltipTimer);
+            hideTooltipTimer = null;
+        }
     });
 
     previewTooltip.addEventListener('mouseleave', () => {
-        previewTooltip.dataset.hovered = 'false';
         hidePreviewTooltip();
     });
 }
@@ -856,16 +889,15 @@ function positionPreviewTooltip(item) {
  */
 let hideTooltipTimer = null;
 function hidePreviewTooltip() {
-    if (hideTooltipTimer) {
-        clearTimeout(hideTooltipTimer);
-    }
-
     hideTooltipTimer = setTimeout(() => {
-        if (previewTooltip && previewTooltip.dataset.hovered !== 'true') {
-            previewTooltip.remove();
-            previewTooltip = null;
+        const tooltip = document.getElementById('promptpal-preview-tooltip');
+        if (tooltip) {
+            tooltip.style.opacity = '0';
+            setTimeout(() => tooltip.remove(), 150);
         }
-    }, 150);
+        previewTooltip = null;
+        hideTooltipTimer = null;
+    }, 100);
 }
 
 /**
@@ -1577,6 +1609,145 @@ function addFloatingUIStyles() {
       
       .promptpal-edit-btn-secondary:hover {
         background: #4b5563;
+      }
+    }
+    
+    /* Preview Tooltip Styles */
+    .promptpal-preview-tooltip {
+      position: fixed;
+      z-index: 1000001;
+      width: 380px;
+      max-height: 320px;
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      pointer-events: auto;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip {
+        background: rgba(31, 41, 55, 0.98);
+        border-color: #374151;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+    }
+    
+    .promptpal-preview-tooltip .preview-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f9fafb;
+    }
+    
+    .promptpal-preview-tooltip .preview-header strong {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .promptpal-preview-tooltip .preview-header .pin-badge {
+      font-size: 12px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip .preview-header {
+        background: #111827;
+        border-bottom-color: #374151;
+      }
+      
+      .promptpal-preview-tooltip .preview-header strong {
+        color: #f3f4f6;
+      }
+    }
+    
+    .promptpal-preview-tooltip .preview-content {
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #374151;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip .preview-content {
+        color: #d1d5db;
+      }
+    }
+    
+    .promptpal-preview-tooltip .preview-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .promptpal-preview-tooltip .preview-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .promptpal-preview-tooltip .preview-content::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip .preview-content::-webkit-scrollbar-thumb {
+        background: #4b5563;
+      }
+    }
+    
+    .promptpal-preview-tooltip .preview-variable {
+      color: #7c3aed;
+      background: rgba(124, 58, 237, 0.1);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 500;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip .preview-variable {
+        color: #a78bfa;
+        background: rgba(167, 139, 250, 0.15);
+      }
+    }
+    
+    .promptpal-preview-tooltip .preview-tags {
+      padding: 8px 16px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip .preview-tags {
+        border-top-color: #374151;
+      }
+    }
+    
+    .promptpal-preview-tooltip .preview-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      background: #e0e7ff;
+      color: #4338ca;
+      border-radius: 4px;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .promptpal-preview-tooltip .preview-tag {
+        background: rgba(99, 102, 241, 0.2);
+        color: #a5b4fc;
       }
     }
   `;
