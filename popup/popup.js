@@ -156,6 +156,16 @@ function createPromptCard(prompt) {
     card.appendChild(content);
     card.appendChild(pinBtn);
 
+    // Add structured indicator for prompts with variables
+    if (prompt.isStructured || (prompt.variables && prompt.variables.length > 0)) {
+        const badge = document.createElement('span');
+        badge.className = 'structured-indicator';
+        badge.textContent = `📝 ${prompt.variables.length}`;
+        badge.title = `Structured prompt with ${prompt.variables.length} variable${prompt.variables.length !== 1 ? 's' : ''}`;
+        card.insertBefore(badge, content);
+        card.classList.add('has-variables');
+    }
+
     return card;
 }
 
@@ -269,20 +279,37 @@ async function insertPrompt(prompt) {
             return;
         }
 
-        // Send message to background to insert
-        await chrome.runtime.sendMessage({
-            action: 'insert_prompt',
-            text: prompt.content,
-            promptId: prompt.id
-        });
+        // Check if this is a structured prompt with variables
+        const isStructured = prompt.isStructured || (prompt.variables && prompt.variables.length > 0);
 
-        // Show success (brief)
-        showFeedback('success', I18n.getMessage('toast_inserted'));
+        if (isStructured) {
+            // Send structured prompt to content script to show variable form
+            await chrome.runtime.sendMessage({
+                action: 'insert_structured_prompt',
+                prompt: prompt
+            });
 
-        // Close popup after short delay
-        setTimeout(() => {
-            window.close();
-        }, 500);
+            // Close popup - form will appear in content script
+            showFeedback('success', 'Fill in the variables');
+            setTimeout(() => {
+                window.close();
+            }, 300);
+        } else {
+            // Regular prompt - insert directly
+            await chrome.runtime.sendMessage({
+                action: 'insert_prompt',
+                text: prompt.content,
+                promptId: prompt.id
+            });
+
+            // Show success (brief)
+            showFeedback('success', I18n.getMessage('toast_inserted'));
+
+            // Close popup after short delay
+            setTimeout(() => {
+                window.close();
+            }, 500);
+        }
 
     } catch (error) {
         console.error('Error inserting prompt:', error);

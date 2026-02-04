@@ -286,6 +286,29 @@ body {
   opacity: 1;
 }
 
+/* Structured Prompt Indicator */
+.structured-indicator {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.prompt-card.has-variables {
+  border-left: 3px solid #4F46E5;
+}
+
+.prompt-card.has-variables:hover {
+  border-color: #7C3AED;
+  border-left-color: #7C3AED;
+}
+
 /* Empty State */
 .empty-state {
   display: flex;

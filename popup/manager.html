@@ -103,6 +103,26 @@
                     <label for="edit-tags" data-i18n="prompt_tags_label">Tags</label>
                     <input type="text" id="edit-tags" class="form-input" placeholder="Comma-separated">
                 </div>
+
+                <!-- Variables Panel -->
+                <div id="variables-panel" class="variables-panel">
+                    <div class="variables-header">
+                        <h3>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 7h6v6H4zM14 7h6v6h-6zM9 17h6v6H9z" />
+                            </svg>
+                            Detected Variables
+                        </h3>
+                        <span id="variable-count" class="variable-count">0 variables</span>
+                    </div>
+                    <div id="variables-list" class="variables-list">
+                        <div class="no-variables">
+                            <span>💡</span>
+                            <p>Use <code>[variable_name]</code> syntax in your prompt to create fillable fields</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -112,6 +132,7 @@
         </div>
     </div>
 
+    <script src="../lib/variables.js"></script>
     <script src="../lib/storage.js"></script>
     <script src="../lib/i18n.js"></script>
     <script src="../lib/help_system.js"></script>

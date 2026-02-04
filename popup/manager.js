@@ -22,10 +22,16 @@ const editContent = document.getElementById('edit-content');
 const editCategory = document.getElementById('edit-category');
 const editTags = document.getElementById('edit-tags');
 
+// Variable panel elements
+const variablesPanel = document.getElementById('variables-panel');
+const variablesList = document.getElementById('variables-list');
+const variableCount = document.getElementById('variable-count');
+
 // State
 let allPrompts = [];
 let filteredPrompts = [];
 let currentEditingId = null;
+let currentEditingVariables = [];
 
 /**
  * Initialize manager
@@ -186,6 +192,20 @@ function createPromptCard(prompt) {
     card.appendChild(content);
     card.appendChild(meta);
 
+    // Add structured badge if prompt has variables
+    if (prompt.isStructured || (prompt.variables && prompt.variables.length > 0)) {
+        const badge = document.createElement('div');
+        badge.className = 'structured-badge';
+        badge.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7h6v6H4zM14 7h6v6h-6zM9 17h6v6H9z"/>
+            </svg>
+            ${prompt.variables.length} var${prompt.variables.length !== 1 ? 's' : ''}
+        `;
+        badge.title = 'Structured prompt with fillable variables';
+        card.appendChild(badge);
+    }
+
     // Click to insert
     card.addEventListener('click', () => {
         insertPrompt(prompt);
@@ -216,6 +236,15 @@ function setupEventListeners() {
         if (e.target === editModal) {
             closeEditModal();
         }
+    });
+
+    // Content change listener for variable detection
+    let variableDetectionTimeout;
+    editContent.addEventListener('input', () => {
+        clearTimeout(variableDetectionTimeout);
+        variableDetectionTimeout = setTimeout(() => {
+            updateVariablesPanel(editContent.value);
+        }, 300); // Debounce for performance
     });
 
     // Help button
@@ -266,10 +295,15 @@ async function togglePin(promptId) {
  */
 function openEditModal(prompt) {
     currentEditingId = prompt.id;
+    currentEditingVariables = prompt.variables || [];
+
     editTitle.value = prompt.title;
     editContent.value = prompt.content;
     editCategory.value = prompt.category || '';
     editTags.value = (prompt.tags || []).join(', ');
+
+    // Update variables panel
+    updateVariablesPanel(prompt.content);
 
     editModal.style.display = 'flex';
 }
@@ -293,7 +327,8 @@ async function saveEditedPrompt() {
             title: editTitle.value.trim(),
             content: editContent.value.trim(),
             category: editCategory.value.trim() || 'Uncategorized',
-            tags: editTags.value.split(',').map(t => t.trim()).filter(Boolean)
+            tags: editTags.value.split(',').map(t => t.trim()).filter(Boolean),
+            variables: currentEditingVariables
         };
 
         await Storage.updatePrompt(currentEditingId, updates);
@@ -326,14 +361,90 @@ async function deletePrompt(promptId) {
  */
 async function insertPrompt(prompt) {
     try {
-        await chrome.runtime.sendMessage({
-            action: 'insert_prompt',
-            text: prompt.content,
-            promptId: prompt.id
-        });
+        // Check if this is a structured prompt with variables
+        const isStructured = prompt.isStructured || (prompt.variables && prompt.variables.length > 0);
+
+        if (isStructured) {
+            // Send structured prompt to show variable form
+            await chrome.runtime.sendMessage({
+                action: 'insert_structured_prompt',
+                prompt: prompt
+            });
+        } else {
+            // Regular prompt - insert directly
+            await chrome.runtime.sendMessage({
+                action: 'insert_prompt',
+                text: prompt.content,
+                promptId: prompt.id
+            });
+        }
     } catch (error) {
         console.error('Error inserting prompt:', error);
     }
+}
+
+/**
+ * Update variables panel based on content
+ */
+function updateVariablesPanel(content) {
+    if (!variablesPanel || !variablesList || !variableCount) return;
+
+    if (typeof VariableUtils === 'undefined') {
+        console.warn('VariableUtils not loaded');
+        return;
+    }
+
+    // Extract variables using VariableUtils, preserving existing configs
+    currentEditingVariables = VariableUtils.extractVariablesForPrompt(
+        content,
+        currentEditingVariables
+    );
+
+    const count = currentEditingVariables.length;
+    variableCount.textContent = `${count} variable${count !== 1 ? 's' : ''}`;
+
+    if (count === 0) {
+        variablesList.innerHTML = `
+            <div class="no-variables">
+                <span>💡</span>
+                <p>Use <code>[variable_name]</code> syntax in your prompt to create fillable fields</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Render variable items
+    variablesList.innerHTML = currentEditingVariables.map((variable, index) =>
+        renderVariableItem(variable, index)
+    ).join('');
+
+    // Add event listeners for type changes
+    variablesList.querySelectorAll('.variable-type-select').forEach((select, index) => {
+        select.addEventListener('change', (e) => {
+            currentEditingVariables[index].type = e.target.value;
+        });
+    });
+}
+
+/**
+ * Render a single variable item
+ */
+function renderVariableItem(variable, index) {
+    return `
+        <div class="variable-item" data-index="${index}">
+            <div class="variable-info">
+                <span class="variable-name">[${variable.name}]</span>
+                <span class="variable-type-badge ${variable.type}">${variable.type}</span>
+            </div>
+            <div class="variable-config">
+                <select class="variable-type-select" data-index="${index}">
+                    <option value="text" ${variable.type === 'text' ? 'selected' : ''}>Text</option>
+                    <option value="options" ${variable.type === 'options' ? 'selected' : ''}>Options</option>
+                    <option value="number" ${variable.type === 'number' ? 'selected' : ''}>Number</option>
+                </select>
+            </div>
+        </div>
+    `;
 }
 
 // Initialize

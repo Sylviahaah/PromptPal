@@ -55,6 +55,17 @@ const StorageHelper = {
         throw new Error('Prompt not found');
     },
 
+    async updatePrompt(id, updates) {
+        const prompts = await this.getAllPrompts();
+        const index = prompts.findIndex(p => p.id === id);
+        if (index !== -1) {
+            prompts[index] = { ...prompts[index], ...updates };
+            await chrome.storage.local.set({ prompts });
+            return prompts[index];
+        }
+        throw new Error('Prompt not found');
+    },
+
     _generateTitle(content) {
         const firstLine = content.split('\n')[0];
         return firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : firstLine;
@@ -383,10 +394,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true; // Async response
     }
 
+    // Handle structured prompts with variables
+    if (message.action === 'insert_structured_prompt') {
+        (async () => {
+            try {
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (tabs[0]) {
+                    await ensureContentScript(tabs[0].id);
+
+                    // Send structured prompt to content script for variable form
+                    await chrome.tabs.sendMessage(tabs[0].id, {
+                        action: 'inject_structured_prompt',
+                        prompt: message.prompt
+                    });
+
+                    sendResponse({ success: true });
+                } else {
+                    sendResponse({ success: false, error: 'No active tab found' });
+                }
+            } catch (error) {
+                console.error('[Background] Insert structured prompt error:', error);
+                sendResponse({ success: false, error: error.message });
+            }
+        })();
+        return true; // Async response
+    }
+
     if (message.action === 'show_notification') {
         showNotification(message.type, message.message);
         sendResponse({ success: true });
         // No return true - this is synchronous
+    }
+
+    // Handle update prompt from floating edit modal
+    if (message.action === 'update_prompt') {
+        StorageHelper.updatePrompt(message.promptId, message.updates)
+            .then(prompt => sendResponse({ success: true, prompt }))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true; // Async response
     }
 });
 
