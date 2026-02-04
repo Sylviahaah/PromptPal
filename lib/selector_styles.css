@@ -1,0 +1,650 @@
+/**
+ * Unified Prompt Selector Styles
+ * Shared between popup and modal contexts
+ * 
+ * @file lib/selector_styles.css
+ */
+
+/* ============================================
+   Container & Layout
+   ============================================ */
+
+.ups-container {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Popup context */
+.ups-container.ups-popup {
+    width: 400px;
+    max-height: 500px;
+    border: 1px solid #e5e7eb;
+}
+
+/* Modal context */
+.ups-container.ups-modal {
+    position: absolute;
+    z-index: 999999;
+    width: 420px;
+    max-height: 520px;
+    border: 1px solid #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-container {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+}
+
+/* ============================================
+   Header
+   ============================================ */
+
+.ups-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ups-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.ups-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #9ca3af;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: all 0.15s;
+}
+
+.ups-close-btn:hover {
+    background: #f3f4f6;
+    color: #ef4444;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-header {
+        border-bottom-color: #374151;
+    }
+
+    .ups-title {
+        color: #f3f4f6;
+    }
+
+    .ups-close-btn:hover {
+        background: #374151;
+        color: #f87171;
+    }
+}
+
+/* ============================================
+   Search
+   ============================================ */
+
+.ups-search-container {
+    position: relative;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ups-search-input {
+    width: 100%;
+    padding: 10px 36px 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #f9fafb;
+    color: #1f2937;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.ups-search-input:focus {
+    outline: none;
+    border-color: #4F46E5;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.ups-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.ups-search-clear {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: all 0.15s;
+    display: none;
+}
+
+.ups-search-clear:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-search-container {
+        border-bottom-color: #374151;
+    }
+
+    .ups-search-input {
+        background: #111827;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .ups-search-input:focus {
+        background: #1f2937;
+        border-color: #6366f1;
+    }
+
+    .ups-search-clear:hover {
+        background: #7f1d1d;
+    }
+}
+
+/* ============================================
+   List
+   ============================================ */
+
+.ups-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 320px;
+}
+
+.ups-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ups-item:hover,
+.ups-item.selected {
+    background-color: #f3f4f6;
+}
+
+.ups-item:last-child {
+    border-bottom: none;
+}
+
+.ups-pin-icon {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.ups-item-title {
+    flex: 1;
+    font-size: 14px;
+    color: #1f2937;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ups-edit-hint {
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.ups-item:hover .ups-edit-hint {
+    opacity: 0.6;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-item {
+        border-bottom-color: #374151;
+    }
+
+    .ups-item:hover,
+    .ups-item.selected {
+        background-color: #374151;
+    }
+
+    .ups-item-title {
+        color: #f3f4f6;
+    }
+}
+
+/* ============================================
+   No Results
+   ============================================ */
+
+.ups-no-results {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.ups-no-results span {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.ups-no-results p {
+    margin: 0;
+    font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-no-results {
+        color: #9ca3af;
+    }
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+
+.ups-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 12px;
+    color: #6b7280;
+    text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-footer {
+        border-top-color: #374151;
+        color: #9ca3af;
+    }
+}
+
+/* ============================================
+   Preview Tooltip
+   ============================================ */
+
+.ups-preview-tooltip {
+    position: fixed;
+    z-index: 10000000;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 320px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    animation: ups-tooltip-fade 0.15s ease;
+}
+
+@keyframes ups-tooltip-fade {
+    from {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.ups-preview-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ups-preview-header strong {
+    font-size: 14px;
+    color: #1f2937;
+    flex: 1;
+}
+
+.ups-preview-pin {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.ups-preview-content {
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #4b5563;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.ups-preview-tags {
+    padding: 0 16px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ups-preview-tag {
+    font-size: 11px;
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-preview-tooltip {
+        background: #1f2937;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .ups-preview-header {
+        border-bottom-color: #374151;
+    }
+
+    .ups-preview-header strong {
+        color: #f3f4f6;
+    }
+
+    .ups-preview-content {
+        color: #d1d5db;
+    }
+
+    .ups-preview-tag {
+        background: #374151;
+        color: #9ca3af;
+    }
+}
+
+/* ============================================
+   Edit Modal (Inline)
+   ============================================ */
+
+.ups-edit-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000001;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    animation: ups-fade-in 0.2s ease;
+}
+
+@keyframes ups-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.ups-edit-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 90%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: ups-slide-up 0.3s ease;
+}
+
+@keyframes ups-slide-up {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.ups-edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ups-edit-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.ups-edit-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: all 0.15s;
+}
+
+.ups-edit-close:hover {
+    background: #f3f4f6;
+    color: #ef4444;
+}
+
+.ups-edit-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.ups-edit-field {
+    margin-bottom: 16px;
+}
+
+.ups-edit-field:last-child {
+    margin-bottom: 0;
+}
+
+.ups-edit-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.ups-edit-field input,
+.ups-edit-field textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    color: #1f2937;
+    background: white;
+}
+
+.ups-edit-field input:focus,
+.ups-edit-field textarea:focus {
+    outline: none;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.ups-edit-field textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.ups-edit-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.ups-edit-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.ups-edit-btn-primary {
+    background: linear-gradient(135deg, #4F46E5, #7C3AED);
+    color: white;
+}
+
+.ups-edit-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
+.ups-edit-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.ups-edit-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-edit-container {
+        background: #1f2937;
+    }
+
+    .ups-edit-header {
+        border-bottom-color: #374151;
+    }
+
+    .ups-edit-header h3 {
+        color: #f3f4f6;
+    }
+
+    .ups-edit-close:hover {
+        background: #374151;
+    }
+
+    .ups-edit-field label {
+        color: #d1d5db;
+    }
+
+    .ups-edit-field input,
+    .ups-edit-field textarea {
+        background: #111827;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .ups-edit-field input:focus,
+    .ups-edit-field textarea:focus {
+        border-color: #6366f1;
+    }
+
+    .ups-edit-footer {
+        background: #111827;
+        border-top-color: #374151;
+    }
+
+    .ups-edit-btn-secondary {
+        background: #374151;
+        color: #f3f4f6;
+    }
+
+    .ups-edit-btn-secondary:hover {
+        background: #4b5563;
+    }
+}
+
+/* ============================================
+   Quick Save (Popup only)
+   ============================================ */
+
+.ups-quick-save-toggle {
+    padding: 8px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ups-quick-save-btn {
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+    color: #6b7280;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.ups-quick-save-btn:hover {
+    border-color: #4F46E5;
+    color: #4F46E5;
+    background: #f5f3ff;
+}
+
+@media (prefers-color-scheme: dark) {
+    .ups-quick-save-toggle {
+        border-bottom-color: #374151;
+    }
+
+    .ups-quick-save-btn {
+        border-color: #4b5563;
+        color: #9ca3af;
+    }
+
+    .ups-quick-save-btn:hover {
+        border-color: #6366f1;
+        color: #818cf8;
+        background: rgba(99, 102, 241, 0.1);
+    }
+}

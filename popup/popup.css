@@ -443,3 +443,179 @@ body {
   background: #10B981;
   animation: successPulse 0.5s ease;
 }
+
+/* ============================================
+   Prompt Action Buttons (hover reveal)
+   ============================================ */
+
+.prompt-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.prompt-card:hover .prompt-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: all 0.15s;
+}
+
+.action-btn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.action-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .action-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* ============================================
+   Inline Edit Form
+   ============================================ */
+
+.prompt-card.editing {
+  background: #f9fafb;
+  border-color: #4F46E5;
+}
+
+.prompt-card.editing .prompt-content,
+.prompt-card.editing .prompt-actions {
+  display: none;
+}
+
+.inline-edit-form {
+  width: 100%;
+  padding: 12px;
+}
+
+.edit-field {
+  margin-bottom: 12px;
+}
+
+.edit-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.edit-input,
+.edit-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.edit-input:focus,
+.edit-textarea:focus {
+  outline: none;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.edit-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.edit-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.edit-btn-primary {
+  background: #4F46E5;
+  color: white;
+}
+
+.edit-btn-primary:hover {
+  background: #4338CA;
+}
+
+.edit-btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.edit-btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.edit-hint {
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .prompt-card.editing {
+    background: #1f2937;
+    border-color: #6366f1;
+  }
+
+  .edit-field label {
+    color: #9ca3af;
+  }
+
+  .edit-input,
+  .edit-textarea {
+    background: #111827;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+
+  .edit-input:focus,
+  .edit-textarea:focus {
+    border-color: #6366f1;
+  }
+
+  .edit-btn-secondary {
+    background: #374151;
+    color: #f3f4f6;
+  }
+
+  .edit-btn-secondary:hover {
+    background: #4b5563;
+  }
+}

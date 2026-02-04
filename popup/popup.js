@@ -118,7 +118,7 @@ function createPromptCard(prompt) {
     card.className = 'prompt-card';
     card.dataset.promptId = prompt.id;
 
-    // Content
+    // Content wrapper
     const content = document.createElement('div');
     content.className = 'prompt-content';
 
@@ -133,28 +133,73 @@ function createPromptCard(prompt) {
     content.appendChild(title);
     content.appendChild(preview);
 
+    // Action buttons container (shown on hover)
+    const actions = document.createElement('div');
+    actions.className = 'prompt-actions';
+
     // Pin button
     const pinBtn = document.createElement('button');
-    pinBtn.className = 'pin-btn';
-    pinBtn.textContent = prompt.isPinned ? '📌' : '📍';
-    pinBtn.title = prompt.isPinned ? I18n.getMessage('unpin_prompt') : I18n.getMessage('pin_prompt');
-    if (prompt.isPinned) {
-        pinBtn.classList.add('pinned');
-    }
-
-    // Click on pin button
+    pinBtn.className = 'action-btn';
+    pinBtn.innerHTML = prompt.isPinned ? '📌' : '📍';
+    pinBtn.title = prompt.isPinned ? 'Unpin' : 'Pin';
     pinBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
         await togglePin(prompt.id);
     });
 
-    // Click on card - insert prompt
-    card.addEventListener('click', async () => {
-        await insertPrompt(prompt);
+    // Edit button
+    const editBtn = document.createElement('button');
+    editBtn.className = 'action-btn';
+    editBtn.innerHTML = '✏️';
+    editBtn.title = 'Edit';
+    editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openInlineEdit(prompt, card);
+    });
+
+    // Delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'action-btn action-btn-danger';
+    deleteBtn.innerHTML = '🗑️';
+    deleteBtn.title = 'Delete';
+    deleteBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await deletePrompt(prompt.id);
+    });
+
+    actions.appendChild(pinBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+
+    // Double-click detection for edit
+    let clickTimer = null;
+    card.addEventListener('click', (e) => {
+        // Don't trigger if clicking action buttons or inside edit form
+        if (e.target.closest('.prompt-actions')) return;
+        if (e.target.closest('.inline-edit-form')) return;
+
+        // Skip if in edit mode
+        if (currentEditId !== null) return;
+
+        if (clickTimer) {
+            // Double click detected
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            openInlineEdit(prompt, card);
+        } else {
+            // Wait for potential double click
+            clickTimer = setTimeout(async () => {
+                clickTimer = null;
+                // Double-check not in edit mode before inserting
+                if (currentEditId === null) {
+                    await insertPrompt(prompt);
+                }
+            }, 300);
+        }
     });
 
     card.appendChild(content);
-    card.appendChild(pinBtn);
+    card.appendChild(actions);
 
     // Add structured indicator for prompts with variables
     if (prompt.isStructured || (prompt.variables && prompt.variables.length > 0)) {
@@ -327,6 +372,156 @@ async function togglePin(promptId) {
     } catch (error) {
         console.error('Error toggling pin:', error);
     }
+}
+
+// Track current edit state
+let currentEditId = null;
+let editForm = null;
+
+/**
+ * Open inline edit form for a prompt
+ */
+function openInlineEdit(prompt, card) {
+    // Close any existing edit form
+    if (editForm) {
+        closeInlineEdit();
+    }
+
+    currentEditId = prompt.id;
+
+    // Create edit form
+    editForm = document.createElement('div');
+    editForm.className = 'inline-edit-form';
+    editForm.innerHTML = `
+        <div class="edit-field">
+            <label>Title</label>
+            <input type="text" class="edit-input" id="edit-title" value="${escapeHtml(prompt.title)}" />
+        </div>
+        <div class="edit-field">
+            <label>Content</label>
+            <textarea class="edit-textarea" id="edit-content" rows="4">${escapeHtml(prompt.content)}</textarea>
+        </div>
+        <div class="edit-actions">
+            <button class="edit-btn edit-btn-secondary" id="edit-cancel">Cancel</button>
+            <button class="edit-btn edit-btn-primary" id="edit-save">Save</button>
+        </div>
+        <div class="edit-hint">Ctrl+Enter save • ESC cancel</div>
+    `;
+
+    // Hide card content, show edit form
+    card.classList.add('editing');
+    card.appendChild(editForm);
+
+    // Stop clicks inside form from bubbling to card
+    editForm.addEventListener('click', (e) => e.stopPropagation());
+
+    // Setup event listeners
+    const titleInput = editForm.querySelector('#edit-title');
+    const contentInput = editForm.querySelector('#edit-content');
+    const editSaveBtn = editForm.querySelector('#edit-save');
+    const cancelBtn = editForm.querySelector('#edit-cancel');
+
+    editSaveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        saveInlineEdit(prompt.id);
+    });
+    cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeInlineEdit();
+    });
+
+    // Keyboard shortcuts
+    editForm.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            closeInlineEdit();
+        }
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.stopPropagation();
+            saveInlineEdit(prompt.id);
+        }
+    });
+
+    // Focus title
+    setTimeout(() => titleInput.focus(), 50);
+}
+
+/**
+ * Close inline edit form
+ */
+function closeInlineEdit() {
+    if (editForm) {
+        const card = editForm.closest('.prompt-card');
+        if (card) {
+            card.classList.remove('editing');
+        }
+        editForm.remove();
+        editForm = null;
+    }
+    currentEditId = null;
+}
+
+/**
+ * Save inline edit changes
+ */
+async function saveInlineEdit(promptId) {
+    const titleInput = editForm.querySelector('#edit-title');
+    const contentInput = editForm.querySelector('#edit-content');
+
+    const title = titleInput.value.trim();
+    const content = contentInput.value.trim();
+
+    if (!title || !content) {
+        showFeedback('error', 'Title and content required');
+        return;
+    }
+
+    try {
+        await chrome.runtime.sendMessage({
+            action: 'update_prompt',
+            promptId: promptId,
+            updates: { title, content }
+        });
+
+        showFeedback('success', 'Saved!');
+        closeInlineEdit();
+        await loadPrompts();
+    } catch (error) {
+        console.error('Error saving edit:', error);
+        showFeedback('error', 'Save failed');
+    }
+}
+
+/**
+ * Delete prompt with confirmation
+ */
+async function deletePrompt(promptId) {
+    const prompt = prompts.find(p => p.id === promptId);
+    if (!prompt) return;
+
+    if (!confirm(`Delete "${prompt.title}"?`)) return;
+
+    try {
+        await chrome.runtime.sendMessage({
+            action: 'delete_prompt',
+            promptId: promptId
+        });
+
+        showFeedback('success', 'Deleted');
+        await loadPrompts();
+    } catch (error) {
+        console.error('Error deleting prompt:', error);
+        showFeedback('error', 'Delete failed');
+    }
+}
+
+/**
+ * Escape HTML for safe display
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text || '';
+    return div.innerHTML;
 }
 
 /**
