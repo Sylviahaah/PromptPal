@@ -2583,55 +2583,108 @@ function addVariableFormStyles() {
 
 /**
  * Show toast notification
+ * Types: 'success', 'error', 'warning', 'info'
  */
 function showToast(message, type = 'info') {
+    // Remove existing toast if any
+    const existingToast = document.querySelector('.promptpal-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
     const toast = document.createElement('div');
     toast.className = `promptpal-toast promptpal-toast-${type}`;
-    toast.textContent = message;
+
+    // Add ARIA attributes for accessibility
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.setAttribute('aria-atomic', 'true');
+
+    // Icon mapping for different types
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+
+    // Color mapping
+    const colors = {
+        success: '#10B981',
+        error: '#EF4444',
+        warning: '#F59E0B',
+        info: '#4F46E5'
+    };
+
+    toast.innerHTML = `
+        <span class="promptpal-toast-icon">${icons[type] || icons.info}</span>
+        <span class="promptpal-toast-message">${message}</span>
+    `;
 
     const toastStyles = `
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 9999999;
-    background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#4F46E5'};
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-family: system-ui, sans-serif;
-    font-size: 14px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    animation: promptpal-slide-in 0.3s ease;
-  `;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 2147483647;
+        background: ${colors[type] || colors.info};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        animation: promptpal-toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-width: 320px;
+        word-break: break-word;
+    `;
 
     toast.style.cssText = toastStyles;
 
-    // Add animation
+    // Add animation styles if not already present
     if (!document.getElementById('promptpal-toast-animation')) {
         const animStyle = document.createElement('style');
         animStyle.id = 'promptpal-toast-animation';
         animStyle.textContent = `
-      @keyframes promptpal-slide-in {
-        from {
-          transform: translateY(100px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-    `;
+            @keyframes promptpal-toast-slide-in {
+                from {
+                    transform: translateY(100px) scale(0.9);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+            }
+            @keyframes promptpal-toast-slide-out {
+                from {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(20px) scale(0.95);
+                    opacity: 0;
+                }
+            }
+            .promptpal-toast-icon {
+                font-size: 16px;
+                flex-shrink: 0;
+            }
+            .promptpal-toast-message {
+                line-height: 1.4;
+            }
+        `;
         document.head.appendChild(animStyle);
     }
 
     document.body.appendChild(toast);
 
+    // Auto-dismiss after 2.5 seconds
     setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'all 0.3s ease';
-
+        toast.style.animation = 'promptpal-toast-slide-out 0.3s ease forwards';
         setTimeout(() => toast.remove(), 300);
     }, 2500);
 }
@@ -2688,6 +2741,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.action === 'show_floating_ui') {
         showFloatingUI();
+        sendResponse({ success: true });
+        return true;
+    }
+
+    // Handle feedback toast from background (for ALT+S save, etc.)
+    if (message.action === 'show_feedback') {
+        const { type, text } = message;
+        showToast(text, type || 'info');
         sendResponse({ success: true });
         return true;
     }

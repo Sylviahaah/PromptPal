@@ -80,6 +80,109 @@ const MENU_IDS = {
 };
 
 /**
+ * Unified Feedback Manager
+ * Provides consistent visual feedback across all save operations
+ * Channels: Badge (always) → Toast (preferred) → Notification (fallback)
+ */
+const FeedbackManager = {
+    /**
+     * Dispatch feedback to user through multiple channels
+     * @param {string} type - 'success' | 'error' | 'warning' | 'info'
+     * @param {string} message - Message to display
+     * @param {number} tabId - Optional tab ID for targeted toast
+     */
+    async dispatch(type, message, tabId = null) {
+        console.log(`[Feedback] Dispatching: ${type} - ${message}`);
+
+        // 1. Always update badge (immediate visual feedback)
+        this._updateBadge(type);
+
+        // 2. Try in-page toast if tabId provided
+        if (tabId) {
+            const toastSent = await this._sendToast(tabId, type, message);
+            if (toastSent) return;
+        }
+
+        // 3. Try active tab as fallback
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab?.id && tab.id !== tabId) {
+                const toastSent = await this._sendToast(tab.id, type, message);
+                if (toastSent) return;
+            }
+        } catch (e) {
+            console.log('[Feedback] No active tab available');
+        }
+
+        // 4. Last resort: Browser notification (for chrome:// pages, etc.)
+        if (type === 'error' || type === 'warning') {
+            this._showNotification(type, message);
+        }
+    },
+
+    /**
+     * Update extension badge with type-specific indicator
+     */
+    _updateBadge(type) {
+        const config = {
+            success: { text: '✓', color: '#10B981', duration: 2000 },
+            error: { text: '!', color: '#EF4444', duration: 3000 },
+            warning: { text: '⚠', color: '#F59E0B', duration: 2500 },
+            info: { text: 'i', color: '#4F46E5', duration: 1500 }
+        };
+
+        const c = config[type] || config.info;
+        chrome.action.setBadgeText({ text: c.text });
+        chrome.action.setBadgeBackgroundColor({ color: c.color });
+
+        // Auto-clear badge
+        setTimeout(() => {
+            chrome.action.setBadgeText({ text: '' });
+        }, c.duration);
+    },
+
+    /**
+     * Send toast message to content script
+     * @returns {Promise<boolean>} True if toast was sent successfully
+     */
+    async _sendToast(tabId, type, message) {
+        try {
+            await chrome.tabs.sendMessage(tabId, {
+                action: 'show_feedback',
+                type: type,
+                text: message
+            });
+            return true;
+        } catch (e) {
+            console.log('[Feedback] Toast failed for tab', tabId, ':', e.message);
+            return false;
+        }
+    },
+
+    /**
+     * Show browser notification (fallback)
+     */
+    _showNotification(type, message) {
+        chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'icons/icon-48.png',
+            title: 'PromptPal',
+            message: message,
+            priority: type === 'error' ? 2 : 1
+        });
+
+        // Auto-clear after 3 seconds
+        setTimeout(() => {
+            chrome.notifications.getAll((notifications) => {
+                Object.keys(notifications).forEach(id => {
+                    chrome.notifications.clear(id);
+                });
+            });
+        }, 3000);
+    }
+};
+
+/**
  * Initialize extension on install
  */
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -174,7 +277,7 @@ async function handleSaveSelection(info, tab) {
 
         if (!selectedText || selectedText.trim().length === 0) {
             console.warn('No text selected');
-            showNotification('error', 'Please select some text first');
+            await FeedbackManager.dispatch('error', 'Please select some text first', tab.id);
             return;
         }
 
@@ -193,15 +296,11 @@ async function handleSaveSelection(info, tab) {
 
             console.log('Prompt saved successfully:', prompt.id);
 
-            // Show success notification
-            showNotification('success', chrome.i18n.getMessage('toast_saved') || 'Prompt saved!');
-
-            // Flash icon for visual feedback
-            flashIcon();
+            // Unified feedback via FeedbackManager
+            await FeedbackManager.dispatch('success', 'Saved to Prompt Library', tab.id);
         } else {
             // Detailed save - open popup with pre-filled data
             console.log('Opening detailed save modal...');
-            // Send message to open save modal
             chrome.runtime.sendMessage({
                 action: 'open_save_modal',
                 data: {
@@ -213,7 +312,7 @@ async function handleSaveSelection(info, tab) {
         }
     } catch (error) {
         console.error('Error saving selection:', error);
-        showNotification('error', chrome.i18n.getMessage('toast_error'));
+        await FeedbackManager.dispatch('error', 'Save failed: ' + error.message, tab?.id);
     }
 }
 
@@ -281,7 +380,8 @@ async function handleQuickSave(tab) {
         });
 
         if (!response || !response.text || response.text.trim().length === 0) {
-            showNotification('error', 'Please select some text first');
+            // Unified feedback for no selection
+            await FeedbackManager.dispatch('error', 'Please select some text first', tab.id);
             return;
         }
 
@@ -310,15 +410,12 @@ async function handleQuickSave(tab) {
 
             console.log('Saved prompt:', prompt.id);
 
-            // Show success notification
-            showNotification('success', chrome.i18n.getMessage('toast_saved'));
-
-            // Flash icon
-            flashIcon();
+            // Unified feedback via FeedbackManager
+            await FeedbackManager.dispatch('success', 'Saved to Prompt Library', tab.id);
         }
     } catch (error) {
         console.error('Error in quick save:', error);
-        showNotification('error', chrome.i18n.getMessage('toast_error'));
+        await FeedbackManager.dispatch('error', 'Save failed: ' + error.message, tab?.id);
     }
 }
 
