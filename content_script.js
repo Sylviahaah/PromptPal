@@ -378,6 +378,9 @@ async function showFloatingUI() {
     // Add event listeners for items
     setupFloatingUIListeners(displayPrompts);
 
+    // Setup drag handle for repositioning
+    setupDragHandle();
+
     // Focus search input
     const searchInput = floatingUI.querySelector('#promptpal-search-input');
     if (searchInput) {
@@ -1296,6 +1299,101 @@ function closeFloatingUI() {
 }
 
 /**
+ * Setup drag handle for modal repositioning
+ */
+function setupDragHandle() {
+    if (!floatingUI) return;
+
+    const header = floatingUI.querySelector('.promptpal-header');
+    if (!header) return;
+
+    let isDragging = false;
+    let startX, startY, startLeft, startTop;
+    let animationFrameId = null;
+
+    function onDragStart(e) {
+        // Don't drag if clicking close button
+        if (e.target.closest('.promptpal-close-btn')) return;
+
+        isDragging = true;
+        floatingUI.classList.add('dragging');
+
+        // Get starting positions
+        const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+
+        startX = clientX;
+        startY = clientY;
+
+        const rect = floatingUI.getBoundingClientRect();
+        startLeft = rect.left + window.scrollX;
+        startTop = rect.top + window.scrollY;
+
+        // Add document-level listeners
+        document.addEventListener('mousemove', onDragMove, { passive: true });
+        document.addEventListener('mouseup', onDragEnd);
+        document.addEventListener('touchmove', onDragMove, { passive: true });
+        document.addEventListener('touchend', onDragEnd);
+
+        e.preventDefault();
+    }
+
+    function onDragMove(e) {
+        if (!isDragging) return;
+
+        // Throttle with requestAnimationFrame
+        if (animationFrameId) return;
+
+        animationFrameId = requestAnimationFrame(() => {
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+
+            const deltaX = clientX - startX;
+            const deltaY = clientY - startY;
+
+            let newLeft = startLeft + deltaX;
+            let newTop = startTop + deltaY;
+
+            // Constrain to viewport with 20px margin
+            const rect = floatingUI.getBoundingClientRect();
+            const margin = 20;
+            const maxLeft = window.innerWidth - rect.width - margin + window.scrollX;
+            const maxTop = window.innerHeight - rect.height - margin + window.scrollY;
+
+            newLeft = Math.max(margin, Math.min(newLeft, maxLeft));
+            newTop = Math.max(margin, Math.min(newTop, maxTop));
+
+            floatingUI.style.left = `${newLeft}px`;
+            floatingUI.style.top = `${newTop}px`;
+
+            animationFrameId = null;
+        });
+    }
+
+    function onDragEnd() {
+        if (!isDragging) return;
+
+        isDragging = false;
+        floatingUI.classList.remove('dragging');
+
+        // Cleanup listeners
+        document.removeEventListener('mousemove', onDragMove);
+        document.removeEventListener('mouseup', onDragEnd);
+        document.removeEventListener('touchmove', onDragMove);
+        document.removeEventListener('touchend', onDragEnd);
+
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
+    }
+
+    // Add listeners to header
+    header.addEventListener('mousedown', onDragStart);
+    header.addEventListener('touchstart', onDragStart, { passive: false });
+}
+
+/**
  * Add floating UI styles
  */
 function addFloatingUIStyles() {
@@ -1338,6 +1436,18 @@ function addFloatingUIStyles() {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    .promptpal-header:active {
+      cursor: grabbing;
+    }
+    
+    .promptpal-floating.dragging {
+      opacity: 0.95;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
     
     .promptpal-close-btn {
