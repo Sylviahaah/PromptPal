@@ -10,7 +10,13 @@ const categoryFilter = document.getElementById('category-filter');
 const promptsGrid = document.getElementById('prompts-grid');
 const emptyState = document.getElementById('empty-state');
 const promptCount = document.getElementById('prompt-count');
+const categoryCount = document.getElementById('category-count');
+const usageCount = document.getElementById('usage-count');
 const settingsBtn = document.getElementById('settings-btn');
+
+// Bulk action elements
+const bulkActionBar = document.getElementById('bulk-action-bar');
+const selectionCount = document.getElementById('selection-count');
 
 // Modal elements
 const editModal = document.getElementById('edit-modal');
@@ -32,6 +38,7 @@ let allPrompts = [];
 let filteredPrompts = [];
 let currentEditingId = null;
 let currentEditingVariables = [];
+let selectedIds = new Set(); // Multi-select tracking
 
 /**
  * Initialize manager
@@ -39,7 +46,9 @@ let currentEditingVariables = [];
 async function init() {
     await loadPrompts();
     setupEventListeners();
+    setupBulkActions();
     updateCategoryFilter();
+    updateStatsBadge();
 }
 
 /**
@@ -116,8 +125,20 @@ function renderPrompts() {
  */
 function createPromptCard(prompt) {
     const card = document.createElement('div');
-    card.className = 'prompt-card';
+    card.className = 'prompt-card' + (selectedIds.has(prompt.id) ? ' selected' : '');
     card.dataset.promptId = prompt.id;
+
+    // Multi-select checkbox
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'prompt-checkbox';
+    checkbox.checked = selectedIds.has(prompt.id);
+    checkbox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSelection(prompt.id, checkbox.checked);
+        card.classList.toggle('selected', checkbox.checked);
+    });
+    card.appendChild(checkbox);
 
     // Header with actions
     const header = document.createElement('div');
@@ -206,9 +227,24 @@ function createPromptCard(prompt) {
         card.appendChild(badge);
     }
 
-    // Click to insert
-    card.addEventListener('click', () => {
-        insertPrompt(prompt);
+    // Double-click detection for edit (single click = insert)
+    let clickTimer = null;
+    card.addEventListener('click', (e) => {
+        // Don't trigger if clicking action buttons
+        if (e.target.closest('.prompt-actions')) return;
+
+        if (clickTimer) {
+            // Double click detected - open edit
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            openEditModal(prompt);
+        } else {
+            // Wait for potential double click
+            clickTimer = setTimeout(() => {
+                clickTimer = null;
+                insertPrompt(prompt);
+            }, 300);
+        }
     });
 
     return card;
@@ -225,6 +261,13 @@ function setupEventListeners() {
     settingsBtn.addEventListener('click', () => {
         chrome.tabs.create({ url: chrome.runtime.getURL('settings/settings.html') });
     });
+
+    // Import button - MUST be set up here, not lazily
+    const importBtn = document.getElementById('import-btn');
+    if (importBtn) {
+        importBtn.addEventListener('click', openImportModal);
+        console.log('[Manager] Import button listener attached');
+    }
 
     // Modal controls
     closeModal.addEventListener('click', closeEditModal);
@@ -301,6 +344,9 @@ function openEditModal(prompt) {
     editContent.value = prompt.content;
     editCategory.value = prompt.category || '';
     editTags.value = (prompt.tags || []).join(', ');
+
+    // Populate category suggestions from existing prompts
+    populateCategorySuggestions();
 
     // Update variables panel
     updateVariablesPanel(prompt.content);
@@ -445,6 +491,473 @@ function renderVariableItem(variable, index) {
             </div>
         </div>
     `;
+}
+
+// ==========================================
+// BATCH IMPORT FUNCTIONALITY
+// ==========================================
+
+// Import modal elements (lazily initialized)
+let importModal, importText, importFile, fileNameSpan;
+let previewBtn, startImportBtn, cancelImportBtn, closeImportBtn;
+let importPreview, previewList, progressDiv, progressFill, progressText;
+let statNew, statDuplicate, statCategories, previewProgress;
+let optSkipDuplicates, optOverwrite, optAutoCategory, optDefaultCategory;
+let pendingImportResult = null;
+let fileContent = null;
+
+/**
+ * Initialize import modal elements
+ */
+function initImportElements() {
+    if (importModal) return; // Already initialized
+
+    importModal = document.getElementById('import-modal');
+    importText = document.getElementById('import-text');
+    importFile = document.getElementById('import-file');
+    fileNameSpan = document.getElementById('file-name');
+
+    previewBtn = document.getElementById('preview-import');
+    startImportBtn = document.getElementById('start-import');
+    cancelImportBtn = document.getElementById('cancel-import');
+    closeImportBtn = document.getElementById('close-import-modal');
+
+    importPreview = document.getElementById('import-preview');
+    previewList = document.getElementById('preview-list');
+    progressDiv = document.getElementById('import-progress');
+    progressFill = document.getElementById('progress-fill');
+    progressText = document.getElementById('progress-text');
+
+    statNew = document.getElementById('stat-new');
+    statDuplicate = document.getElementById('stat-duplicate');
+    statCategories = document.getElementById('stat-categories');
+    previewProgress = document.getElementById('preview-progress');
+
+    optSkipDuplicates = document.getElementById('opt-skip-duplicates');
+    optOverwrite = document.getElementById('opt-overwrite');
+    optAutoCategory = document.getElementById('opt-auto-category');
+    optDefaultCategory = document.getElementById('opt-default-category');
+
+    setupImportListeners();
+}
+
+/**
+ * Setup import modal event listeners
+ */
+function setupImportListeners() {
+    // Modal open/close
+    document.getElementById('import-btn')?.addEventListener('click', openImportModal);
+    closeImportBtn?.addEventListener('click', closeImportModal);
+    cancelImportBtn?.addEventListener('click', closeImportModal);
+
+    // Click outside to close
+    importModal?.addEventListener('click', (e) => {
+        if (e.target === importModal) closeImportModal();
+    });
+
+    // Tab switching
+    document.querySelectorAll('.import-tab').forEach(tab => {
+        tab.addEventListener('click', () => switchImportTab(tab.dataset.tab));
+    });
+
+    // File upload
+    importFile?.addEventListener('change', handleFileSelect);
+
+    // Drag and drop
+    const dropZone = document.getElementById('file-drop-zone');
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.txt')) {
+                handleFile(files[0]);
+            }
+        });
+    }
+
+    // Preview button
+    previewBtn?.addEventListener('click', runPreview);
+
+    // Import button
+    startImportBtn?.addEventListener('click', executeImport);
+
+    // Mutual exclusion for skip/overwrite options
+    optSkipDuplicates?.addEventListener('change', () => {
+        if (optSkipDuplicates.checked) {
+            optOverwrite.checked = false;
+        }
+    });
+    optOverwrite?.addEventListener('change', () => {
+        if (optOverwrite.checked) {
+            optSkipDuplicates.checked = false;
+        }
+    });
+}
+
+/**
+ * Open import modal
+ */
+function openImportModal() {
+    initImportElements();
+    resetImportState();
+    importModal.style.display = 'flex';
+}
+
+/**
+ * Close import modal
+ */
+function closeImportModal() {
+    if (importModal) {
+        importModal.style.display = 'none';
+        resetImportState();
+    }
+}
+
+/**
+ * Reset import state
+ */
+function resetImportState() {
+    if (importText) importText.value = '';
+    if (importFile) importFile.value = '';
+    if (fileNameSpan) fileNameSpan.textContent = '';
+    if (importPreview) importPreview.style.display = 'none';
+    if (progressDiv) progressDiv.style.display = 'none';
+    if (previewList) previewList.innerHTML = '';
+    if (startImportBtn) startImportBtn.disabled = true;
+    pendingImportResult = null;
+    fileContent = null;
+}
+
+/**
+ * Switch import tab
+ */
+function switchImportTab(tabName) {
+    document.querySelectorAll('.import-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.import-tab-content').forEach(c => {
+        c.classList.toggle('active', c.id === tabName + '-tab');
+    });
+}
+
+/**
+ * Handle file selection
+ */
+function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) handleFile(file);
+}
+
+/**
+ * Handle file for import
+ */
+async function handleFile(file) {
+    if (!file.name.endsWith('.txt')) {
+        alert('请选择 .txt 文件');
+        return;
+    }
+
+    fileNameSpan.textContent = file.name;
+
+    try {
+        fileContent = await BatchImporter.parseFile(file);
+    } catch (error) {
+        console.error('File read error:', error);
+        alert('文件读取失败');
+    }
+}
+
+/**
+ * Get import text from current tab
+ */
+function getImportText() {
+    const pasteTab = document.getElementById('paste-tab');
+    if (pasteTab?.classList.contains('active')) {
+        return importText?.value || '';
+    } else {
+        return fileContent || '';
+    }
+}
+
+/**
+ * Run preview processing
+ */
+async function runPreview() {
+    const text = getImportText();
+    if (!text.trim()) {
+        alert('请输入或上传要导入的内容');
+        return;
+    }
+
+    // Show progress
+    progressDiv.style.display = 'block';
+    importPreview.style.display = 'block';
+    startImportBtn.disabled = true;
+    progressFill.style.width = '0%';
+    progressText.textContent = '正在分析...';
+
+    const options = {
+        skipDuplicates: optSkipDuplicates?.checked ?? true,
+        overwriteDuplicates: optOverwrite?.checked ?? false,
+        defaultCategory: optDefaultCategory?.value || '默认分类',
+        autoExtractCategory: optAutoCategory?.checked ?? true,
+        onProgress: (current, total) => {
+            const pct = Math.round((current / total) * 100);
+            progressFill.style.width = pct + '%';
+            progressText.textContent = `正在处理 ${current}/${total} 条...`;
+            previewProgress.textContent = `(${current}/${total})`;
+        },
+        onPreviewUpdate: (preview) => {
+            updatePreviewUI(preview);
+        }
+    };
+
+    try {
+        pendingImportResult = await BatchImporter.processText(text, options);
+
+        if (pendingImportResult.success) {
+            progressText.textContent = '分析完成';
+            startImportBtn.disabled = pendingImportResult.prompts.length === 0;
+
+            // Final stats update
+            statNew.textContent = pendingImportResult.stats.new;
+            statDuplicate.textContent = pendingImportResult.stats.duplicateCount;
+            statCategories.textContent = pendingImportResult.newCategories.length;
+
+            // Show sample in preview
+            renderPreviewItems(pendingImportResult.prompts.slice(0, 10), pendingImportResult.duplicates);
+        } else {
+            progressText.textContent = '分析失败: ' + pendingImportResult.error;
+        }
+    } catch (error) {
+        console.error('Preview error:', error);
+        progressText.textContent = '分析出错';
+    }
+}
+
+/**
+ * Update preview UI during processing
+ */
+function updatePreviewUI(preview) {
+    statNew.textContent = preview.newCount;
+    statDuplicate.textContent = preview.duplicateCount;
+    statCategories.textContent = preview.newCategories.length;
+}
+
+/**
+ * Render preview items
+ */
+function renderPreviewItems(prompts, duplicates) {
+    const duplicateContents = new Set(duplicates.map(d => d.content.toLowerCase()));
+
+    previewList.innerHTML = prompts.map(p => `
+        <div class="preview-item ${duplicateContents.has(p.content.toLowerCase()) ? 'duplicate' : ''}">
+            <span class="preview-category">${escapeHtml(p.category)}</span>
+            <span class="preview-content">${escapeHtml(p.title)}</span>
+        </div>
+    `).join('');
+
+    if (prompts.length > 10) {
+        previewList.innerHTML += `<div style="text-align: center; color: #6b7280; font-size: 12px; padding: 8px;">
+            ... 还有 ${prompts.length - 10} 条
+        </div>`;
+    }
+}
+
+/**
+ * Execute the import
+ */
+async function executeImport() {
+    if (!pendingImportResult || !pendingImportResult.success) {
+        alert('请先预览导入内容');
+        return;
+    }
+
+    if (pendingImportResult.prompts.length === 0) {
+        alert('没有可导入的内容');
+        return;
+    }
+
+    startImportBtn.disabled = true;
+    startImportBtn.textContent = '导入中...';
+    progressText.textContent = '正在保存...';
+
+    try {
+        const result = await BatchImporter.commitToStorage(pendingImportResult.prompts, {
+            overwriteDuplicates: optOverwrite?.checked ?? false
+        });
+
+        if (result.success) {
+            const summary = `✅ 导入完成\n· 成功导入: ${result.added} 条提示词\n· 跳过重复: ${pendingImportResult.stats.duplicateCount} 条\n· 新分类: ${pendingImportResult.newCategories.length} 个`;
+            alert(summary);
+
+            closeImportModal();
+            await loadPrompts(); // Refresh the grid
+            updateCategoryFilter(); // Update category dropdown
+            updateStatsBadge();
+        } else {
+            alert('导入失败: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Import error:', error);
+        alert('导入出错');
+    } finally {
+        startImportBtn.textContent = '开始导入';
+        startImportBtn.disabled = false;
+    }
+}
+
+/**
+ * Escape HTML for safe display
+ */
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text || '';
+    return div.innerHTML;
+}
+
+// ==========================================
+// STATISTICS & MULTI-SELECT FUNCTIONS
+// ==========================================
+
+/**
+ * Update statistics badge in header
+ */
+function updateStatsBadge() {
+    const categories = new Set(allPrompts.map(p => p.category || 'Uncategorized'));
+    const totalUses = allPrompts.reduce((sum, p) => sum + (p.usageCount || 0), 0);
+
+    if (promptCount) promptCount.textContent = `${allPrompts.length} prompts`;
+    if (categoryCount) categoryCount.textContent = `${categories.size} categories`;
+    if (usageCount) usageCount.textContent = `${totalUses} uses`;
+}
+
+/**
+ * Toggle prompt selection for multi-select
+ */
+function toggleSelection(promptId, selected) {
+    if (selected) {
+        selectedIds.add(promptId);
+    } else {
+        selectedIds.delete(promptId);
+    }
+    updateBulkActionBar();
+}
+
+/**
+ * Update bulk action bar visibility
+ */
+function updateBulkActionBar() {
+    if (selectedIds.size > 0) {
+        bulkActionBar.style.display = 'flex';
+        selectionCount.textContent = `${selectedIds.size} selected`;
+    } else {
+        bulkActionBar.style.display = 'none';
+    }
+}
+
+/**
+ * Setup bulk action handlers
+ */
+function setupBulkActions() {
+    const bulkMove = document.getElementById('bulk-move');
+    const bulkDelete = document.getElementById('bulk-delete');
+    const bulkExport = document.getElementById('bulk-export');
+    const bulkClear = document.getElementById('bulk-clear');
+
+    bulkClear?.addEventListener('click', () => {
+        selectedIds.clear();
+        updateBulkActionBar();
+        renderPrompts();
+    });
+
+    bulkDelete?.addEventListener('click', async () => {
+        if (selectedIds.size === 0) return;
+
+        const confirm = window.confirm(`确定删除 ${selectedIds.size} 个提示词吗？此操作不可撤销。`);
+        if (!confirm) return;
+
+        try {
+            for (const id of selectedIds) {
+                await Storage.deletePrompt(id);
+            }
+            selectedIds.clear();
+            await loadPrompts();
+            updateStatsBadge();
+        } catch (error) {
+            console.error('Bulk delete error:', error);
+            alert('删除失败');
+        }
+    });
+
+    bulkExport?.addEventListener('click', () => {
+        if (selectedIds.size === 0) return;
+
+        const selected = allPrompts.filter(p => selectedIds.has(p.id));
+        const json = JSON.stringify(selected, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `promptpal_export_${selectedIds.size}_items.json`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+    });
+
+    bulkMove?.addEventListener('click', () => {
+        if (selectedIds.size === 0) return;
+
+        const category = prompt('输入目标分类名称：', '默认分类');
+        if (!category) return;
+
+        moveBulkToCategory(category);
+    });
+}
+
+/**
+ * Move selected prompts to a category
+ */
+async function moveBulkToCategory(category) {
+    try {
+        for (const id of selectedIds) {
+            await Storage.updatePrompt(id, { category });
+        }
+        selectedIds.clear();
+        await loadPrompts();
+        updateCategoryFilter();
+        updateStatsBadge();
+        alert(`已移动到分类: ${category}`);
+    } catch (error) {
+        console.error('Bulk move error:', error);
+        alert('移动失败');
+    }
+}
+
+/**
+ * Populate category suggestions datalist
+ */
+function populateCategorySuggestions() {
+    const datalist = document.getElementById('category-suggestions');
+    if (!datalist) return;
+
+    const categories = new Set(allPrompts.map(p => p.category).filter(Boolean));
+
+    datalist.innerHTML = '';
+    categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        datalist.appendChild(option);
+    });
 }
 
 // Initialize

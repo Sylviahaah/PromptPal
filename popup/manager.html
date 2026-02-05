@@ -14,7 +14,13 @@
         <header class="manager-header">
             <div class="header-left">
                 <h1 data-i18n="extension_name">PromptPal</h1>
-                <span class="prompt-count" id="prompt-count">0 prompts</span>
+                <span class="stats-badge" id="stats-badge">
+                    <span id="prompt-count">0 prompts</span>
+                    <span class="stat-sep">·</span>
+                    <span id="category-count">0 categories</span>
+                    <span class="stat-sep">·</span>
+                    <span id="usage-count">0 uses</span>
+                </span>
             </div>
             <div class="header-right">
                 <button id="help-btn" class="icon-btn" title="Library Help" aria-label="Help">
@@ -25,6 +31,25 @@
                 </button>
             </div>
         </header>
+
+        <!-- Bulk Actions Bar (hidden by default) -->
+        <div id="bulk-action-bar" class="bulk-action-bar" style="display: none;">
+            <span id="selection-count">0 selected</span>
+            <div class="bulk-actions">
+                <button id="bulk-move" class="btn btn-sm" title="Move to category">
+                    📂 Move to...
+                </button>
+                <button id="bulk-delete" class="btn btn-sm btn-danger" title="Delete selected">
+                    🗑️ Delete
+                </button>
+                <button id="bulk-export" class="btn btn-sm" title="Export selected">
+                    📥 Export
+                </button>
+                <button id="bulk-clear" class="btn btn-sm btn-secondary" title="Clear selection">
+                    ✕ Clear
+                </button>
+            </div>
+        </div>
 
         <!-- Search and Filter Bar -->
         <div class="toolbar">
@@ -47,6 +72,10 @@
                 <select id="category-filter">
                     <option value="all">All Categories</option>
                 </select>
+
+                <button id="import-btn" class="btn btn-primary" title="批量导入提示词">
+                    📥 导入
+                </button>
             </div>
         </div>
 
@@ -96,7 +125,14 @@
 
                 <div class="form-group">
                     <label for="edit-category" data-i18n="prompt_category_label">Category</label>
-                    <input type="text" id="edit-category" class="form-input">
+                    <div class="category-input-wrapper">
+                        <input type="text" id="edit-category" class="form-input" list="category-suggestions"
+                            placeholder="Select or type new category..." autocomplete="off">
+                        <datalist id="category-suggestions">
+                            <!-- Populated dynamically -->
+                        </datalist>
+                        <span class="category-hint">💡 Type to create new category</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -131,7 +167,115 @@
             </div>
         </div>
     </div>
+    <!-- Batch Import Modal -->
+    <div id="import-modal" class="modal" style="display: none;">
+        <div class="modal-content import-modal-content">
+            <div class="modal-header">
+                <h2>📥 批量导入提示词</h2>
+                <button id="close-import-modal" class="icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
 
+            <div class="modal-body import-body">
+                <!-- Input Tabs -->
+                <div class="import-tabs">
+                    <button class="import-tab active" data-tab="paste">📝 粘贴文本</button>
+                    <button class="import-tab" data-tab="file">📁 上传文件</button>
+                </div>
+
+                <!-- Paste Input -->
+                <div id="paste-tab" class="import-tab-content active">
+                    <textarea id="import-text" class="import-textarea" rows="8"
+                        placeholder="每行一条提示词，支持[分类]前缀：&#10;[写作] 小红书爆款标题生成器...&#10;[编程] Python代码注释生成...&#10;普通提示词内容..."></textarea>
+                </div>
+
+                <!-- File Upload -->
+                <div id="file-tab" class="import-tab-content">
+                    <div class="file-upload-area" id="file-drop-zone">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>拖放 .txt 文件到此处</p>
+                        <span>或</span>
+                        <label class="file-upload-btn">
+                            选择文件
+                            <input type="file" id="import-file" accept=".txt" hidden>
+                        </label>
+                        <span id="file-name" class="file-name"></span>
+                    </div>
+                </div>
+
+                <!-- Options Panel -->
+                <details class="import-options">
+                    <summary>⚙️ 导入选项</summary>
+                    <div class="options-content">
+                        <label class="option-item">
+                            <input type="checkbox" id="opt-skip-duplicates" checked>
+                            <span>跳过重复内容</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="opt-overwrite">
+                            <span>覆盖重复项</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="opt-auto-category" checked>
+                            <span>自动提取分类标记 [分类]</span>
+                        </label>
+                        <div class="option-item">
+                            <label for="opt-default-category">默认分类：</label>
+                            <input type="text" id="opt-default-category" value="默认分类" class="form-input option-input">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Preview & Stats -->
+                <div id="import-preview" class="import-preview" style="display: none;">
+                    <div class="preview-header">
+                        <span>📊 预览</span>
+                        <span id="preview-progress"></span>
+                    </div>
+                    <div class="preview-stats">
+                        <div class="stat-item stat-new">
+                            <span class="stat-icon">✅</span>
+                            <span>新增: <strong id="stat-new">0</strong> 条</span>
+                        </div>
+                        <div class="stat-item stat-duplicate">
+                            <span class="stat-icon">⚠️</span>
+                            <span>重复: <strong id="stat-duplicate">0</strong> 条</span>
+                        </div>
+                        <div class="stat-item stat-category">
+                            <span class="stat-icon">📂</span>
+                            <span>新分类: <strong id="stat-categories">0</strong> 个</span>
+                        </div>
+                    </div>
+                    <div id="preview-list" class="preview-list"></div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="import-progress" class="import-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">准备中...</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancel-import" class="btn btn-secondary">取消</button>
+                <button id="preview-import" class="btn btn-secondary">预览</button>
+                <button id="start-import" class="btn btn-primary" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../lib/batch-import.js"></script>
     <script src="../lib/variables.js"></script>
     <script src="../lib/storage.js"></script>
     <script src="../lib/i18n.js"></script>
