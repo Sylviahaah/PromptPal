@@ -509,6 +509,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             .catch(error => sendResponse({ success: false, error: error.message }));
         return true; // Async response
     }
+
+    // Handle delete prompt from popup or content script
+    if (message.action === 'delete_prompt') {
+        (async () => {
+            try {
+                console.log('[Background] Deleting prompt:', message.promptId);
+
+                // Get current prompts
+                const { prompts = [] } = await chrome.storage.local.get(['prompts']);
+
+                // Filter out the deleted prompt
+                const updatedPrompts = prompts.filter(p => p.id !== message.promptId);
+
+                if (updatedPrompts.length === prompts.length) {
+                    console.warn('[Background] Prompt not found:', message.promptId);
+                    sendResponse({ success: false, error: 'Prompt not found' });
+                    return;
+                }
+
+                // Save back to storage
+                await chrome.storage.local.set({ prompts: updatedPrompts });
+
+                console.log('[Background] Prompt deleted successfully. Remaining:', updatedPrompts.length);
+                sendResponse({ success: true });
+
+            } catch (error) {
+                console.error('[Background] Delete failed:', error);
+                sendResponse({ success: false, error: error.message });
+            }
+        })();
+        return true; // Async response
+    }
+
+    // Handle toggle pin from content script
+    if (message.action === 'toggle_pin') {
+        StorageHelper.togglePin(message.promptId)
+            .then(prompt => sendResponse({ success: true, prompt }))
+            .catch(error => sendResponse({ success: false, error: error.message }));
+        return true; // Async response
+    }
 });
 
 /**

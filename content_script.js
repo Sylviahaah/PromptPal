@@ -772,11 +772,15 @@ function setupFloatingUIListeners(prompts) {
 
     async function togglePin(prompt, item) {
         try {
-            prompt.isPinned = !prompt.isPinned;
+            const newPinState = !prompt.isPinned;
             await chrome.runtime.sendMessage({
                 action: 'update_prompt',
-                prompt: prompt
+                promptId: prompt.id,
+                updates: { isPinned: newPinState }
             });
+
+            // Update local state
+            prompt.isPinned = newPinState;
 
             // Update pin icon
             const pinIcon = item.querySelector('.pin-icon');
